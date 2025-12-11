@@ -22,22 +22,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom styling dengan GRADIENT BACKGROUND
+# Custom styling dengan card shadows
 st.markdown("""
     <style>
-    /* Main background gradient */
-    .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        min-height: 100vh;
-    }
-    
-    .main {
-        padding-top: 2rem;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        margin: 20px;
-    }
-    
     h1 {
         color: #1f77b4;
         text-align: center;
@@ -54,11 +41,23 @@ st.markdown("""
         padding: 50px 20px;
     }
     
-    .setup-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 40px;
-        border-radius: 15px;
-        color: white;
+    /* Card styling dengan shadow */
+    [data-testid="metric-container"] {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #f0f0f0;
+    }
+    
+    [data-testid="stDataFrame"] {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab-list"] {
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -106,9 +105,9 @@ def load_data(file_path):
 
 # Load data
 try:
-    df = load_data('Keratonian_anomalies_marked-CLEAN.csv')
+    df = load_data('Keratonian_anomalies_marked_CLEAN.csv')
 except FileNotFoundError:
-    st.error("❌ File 'Keratonian_anomalies_marked-CLEAN.csv' tidak ditemukan!")
+    st.error("❌ File 'Keratonian_anomalies_marked_CLEAN.csv' tidak ditemukan!")
     st.info("Pastikan file CSV ada di folder yang sama dengan script ini")
     st.stop()
 
