@@ -285,12 +285,24 @@ else:
     # MAIN HEADER
     # ============================================
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
-        st.markdown(f"### {quarter_label}")
-    
-    st.divider()
+      col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
+            st.markdown(f"### {quarter_label}")
+        
+        # Force center metrics dengan JavaScript
+        st.markdown("""
+        <script>
+        const metrics = document.querySelectorAll('[data-testid="metric-container"]');
+        metrics.forEach(m => {
+            m.style.textAlign = 'center';
+            m.style.display = 'flex';
+            m.style.flexDirection = 'column';
+            m.style.alignItems = 'center';
+            m.style.justifyContent = 'center';
+        });
+        </script>
+        """, unsafe_allow_html=True)
     
     # ============================================
     # KEY METRICS
