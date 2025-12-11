@@ -653,10 +653,19 @@ else:
             st.divider()
             st.write("### Preview Data (100 rows)")
             
-            # Format revenue for preview
-            preview_df = filtered_df[['Tanggal Order', 'Channel', 'Cust', 'Produk', 'Qty', 'Total Penjualan', 'Provinsi', 'Kabupaten']].head(100).copy()
-            preview_df['Total Penjualan'] = preview_df['Total Penjualan'].apply(format_rupiah)
-            st.dataframe(preview_df, use_container_width=True)
+            # Format revenue for preview - PERBAIKAN: Handle missing columns
+            preview_cols = ['Tanggal Order', 'Channel', 'Cust', 'Produk', 'Qty', 'Total Penjualan', 'Provinsi']
+            # Cek kolom mana yang available
+            available_cols = [col for col in preview_cols if col in filtered_df.columns]
+            
+            if len(available_cols) > 0:
+                preview_df = filtered_df[available_cols].head(100).copy()
+                # Format revenue if available
+                if 'Total Penjualan' in preview_df.columns:
+                    preview_df['Total Penjualan'] = preview_df['Total Penjualan'].apply(format_rupiah)
+                st.dataframe(preview_df, use_container_width=True)
+            else:
+                st.warning("⚠️ Tidak ada kolom untuk ditampilkan")
     
     else:
         st.warning("⚠️ Tidak ada data yang sesuai dengan filter yang dipilih. Coba ubah filter!")
