@@ -54,9 +54,9 @@ st.markdown("""
 def format_rupiah(value):
     """Format angka ke format Rupiah (Rp)"""
     if value >= 1_000_000:
-        return f"Rp {value/1_000_000:.1f}M"
+        return f"Rp {value/1_000_000:.1f}Juta"
     elif value >= 1_000:
-        return f"Rp {value/1_000:.0f}K"
+        return f"Rp {value/1_000:.0f}Ribu"
     else:
         return f"Rp {value:,.0f}"
 
