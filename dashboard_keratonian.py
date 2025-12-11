@@ -48,14 +48,17 @@ st.markdown("""
         padding: 20px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         border: 1px solid #f0f0f0;
-        text-align: center;  ← Center align semua text di metrics
+        text-align: center;
+    }
+    
+    [data-testid="stMetricValue"] {
+        text-align: center !important;
+        justify-content: center !important;
     }
     
     [data-testid="stDataFrame"] {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border-radius: 8px;
-        text-align: center !important;  ← Force center value/angka
-        justify-content: center !important;
     }
     
     .stTabs [data-baseweb="tab-list"] {
@@ -64,8 +67,6 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
-
 
 # ============================================
 # HELPER FUNCTIONS
@@ -207,15 +208,7 @@ if not st.session_state.dashboard_ready:
         if st.button("📊 BUKA DASHBOARD", use_container_width=True, type="primary"):
             st.session_state.dashboard_ready = True
             st.rerun()
-
-        # Wrap metrics dalam div centered
-        st.markdown("""
-        <div style="text-align: center; width: 100%;">
-        """, unsafe_allow_html=True)
-        
-        # Metrics di sini
-        metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
-
+    
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================
@@ -285,24 +278,12 @@ else:
     # MAIN HEADER
     # ============================================
     
-  col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
-            st.markdown(f"### {quarter_label}")
-        
-        # Force center metrics dengan JavaScript
-        st.markdown("""
-        <script>
-        const metrics = document.querySelectorAll('[data-testid="metric-container"]');
-        metrics.forEach(m => {
-            m.style.textAlign = 'center';
-            m.style.display = 'flex';
-            m.style.flexDirection = 'column';
-            m.style.alignItems = 'center';
-            m.style.justifyContent = 'center';
-        });
-        </script>
-        """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
+        st.markdown(f"### {quarter_label}")
+    
+    st.divider()
     
     # ============================================
     # KEY METRICS
