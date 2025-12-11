@@ -56,6 +56,10 @@ st.markdown("""
 
 def format_rupiah(value):
     """Format angka ke format Rupiah (Rp) - versi Indonesia"""
+    if pd.isna(value):
+        return "Rp 0"
+    
+    value = float(value)
     if value >= 1_000_000_000:
         return f"Rp {value/1_000_000_000:.2f} Miliar"
     elif value >= 1_000_000:
@@ -64,17 +68,6 @@ def format_rupiah(value):
         return f"Rp {value/1_000:.0f} Ribu"
     else:
         return f"Rp {value:,.0f}"
-
-def format_axis_label(value):
-    """Format angka untuk axis label di chart - tanpa 'Rp'"""
-    if value >= 1_000_000_000:
-        return f"{value/1_000_000_000:.1f}M (Miliar)"
-    elif value >= 1_000_000:
-        return f"{value/1_000_000:.1f}J (Juta)"
-    elif value >= 1_000:
-        return f"{value/1_000:.0f}R (Ribu)"
-    else:
-        return f"{value:,.0f}"
 
 # ============================================
 # LOAD & CACHE DATA
@@ -100,9 +93,9 @@ def load_data(file_path):
 
 # Load data
 try:
-    df = load_data('Keratonian_anomalies_marked_CLEAN.csv')
+    df = load_data('Keratonian_anomalies_marked-CLEAN.csv')
 except FileNotFoundError:
-    st.error("❌ File 'Keratonian_anomalies_marked_CLEAN.csv' tidak ditemukan!")
+    st.error("❌ File 'Keratonian_anomalies_marked-CLEAN.csv' tidak ditemukan!")
     st.info("Pastikan file CSV ada di folder yang sama dengan script ini")
     st.stop()
 
@@ -249,7 +242,12 @@ else:
     if st.sidebar.button("🔄 Reset Filter", use_container_width=True):
         st.rerun()
     
-    # Apply Filters
+    # Apply Filters - PERBAIKAN: Handle empty filter
+    if len(selected_channels) == 0:
+        selected_channels = channels
+    if len(selected_cust_types) == 0:
+        selected_cust_types = cust_types
+    
     filtered_df = dashboard_df[
         (dashboard_df['Channel'].isin(selected_channels)) &
         (dashboard_df['Kategori Channel'].isin(selected_cust_types))
@@ -565,27 +563,37 @@ else:
                 ax.set_title('Revenue by Channel', fontweight='bold')
                 st.pyplot(fig, use_container_width=True)
             
-            st.write("### Top 10 Districts (Hover untuk lihat nilai pasti)")
-            by_district = filtered_df.groupby('Kabupaten')['Total Penjualan'].sum().sort_values(ascending=False).head(10)
-            
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=by_district.values,
-                    y=by_district.index,
-                    orientation='h',
-                    marker=dict(color='steelblue'),
-                    hovertemplate='<b>%{y}</b><br>Revenue: %{text}<extra></extra>',
-                    text=[format_rupiah(v) for v in by_district.values]
-                )
-            ])
-            fig.update_layout(
-                title='Revenue by District',
-                xaxis_title='Revenue (Rp)',
-                yaxis_title='Kabupaten',
-                height=400,
-                hovermode='closest'
-            )
-            st.plotly_chart(fig, use_container_width=True)
+            # PERBAIKAN: Cek apakah kolom Kabupaten ada
+            if 'Kabupaten' in filtered_df.columns and len(filtered_df) > 0:
+                st.write("### Top 10 Districts (Hover untuk lihat nilai pasti)")
+                try:
+                    by_district = filtered_df.groupby('Kabupaten')['Total Penjualan'].sum().sort_values(ascending=False).head(10)
+                    
+                    if len(by_district) > 0:
+                        fig = go.Figure(data=[
+                            go.Bar(
+                                x=by_district.values,
+                                y=by_district.index,
+                                orientation='h',
+                                marker=dict(color='steelblue'),
+                                hovertemplate='<b>%{y}</b><br>Revenue: %{text}<extra></extra>',
+                                text=[format_rupiah(v) for v in by_district.values]
+                            )
+                        ])
+                        fig.update_layout(
+                            title='Revenue by District',
+                            xaxis_title='Revenue (Rp)',
+                            yaxis_title='Kabupaten',
+                            height=400,
+                            hovermode='closest'
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        st.info("ℹ️ Tidak ada data District untuk periode ini")
+                except Exception as e:
+                    st.warning(f"⚠️ Tidak bisa menampilkan data District: {str(e)}")
+            else:
+                st.info("ℹ️ Kolom Kabupaten tidak tersedia atau data kosong")
         
         # ============================================
         # TAB 6: EXPORT
