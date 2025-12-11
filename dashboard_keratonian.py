@@ -22,12 +22,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom styling
+# Custom styling dengan GRADIENT BACKGROUND
 st.markdown("""
     <style>
+    /* Main background gradient */
+    .stApp {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        min-height: 100vh;
+    }
+    
     .main {
         padding-top: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        margin: 20px;
     }
+    
     h1 {
         color: #1f77b4;
         text-align: center;
@@ -46,6 +56,27 @@ st.markdown("""
         padding: 40px;
         border-radius: 15px;
         color: white;
+    }
+
+    /* Styling untuk Quarter buttons */
+    .quarter-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .quarter-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .quarter-button:active {
+        transform: scale(0.98);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -115,10 +146,11 @@ if 'dashboard_ready' not in st.session_state:
 if not st.session_state.dashboard_ready:
     st.markdown("<div class='welcome-container'>", unsafe_allow_html=True)
     
-    # Header
-    st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
-    st.markdown("### 🔧 Setup Dashboard")
-    st.markdown("**Pilih Tahun & Kuartal untuk analisis**")
+    # Header dengan Logo
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
+        st.markdown("### Interactive Analytics & Reporting System")
     
     st.divider()
     
@@ -140,9 +172,8 @@ if not st.session_state.dashboard_ready:
         
         st.divider()
         
-        # Kuartal Selection
+        # Kuartal Selection - CENTERED with better spacing
         st.markdown("#### 📊 Pilih Kuartal:")
-        quarter_cols = st.columns(5)
         
         quarters = [
             ("Q1", 1),
@@ -152,44 +183,58 @@ if not st.session_state.dashboard_ready:
             ("FULL YEAR", None)
         ]
         
+        # Buat 3 baris untuk quarter buttons
+        row1_cols = st.columns([1, 1, 1, 1, 1])
+        
         selected_quarter = st.session_state.selected_quarter
-        for col, (label, value) in zip(quarter_cols, quarters):
+        
+        for idx, (col, (label, value)) in enumerate(zip(row1_cols, quarters)):
             with col:
+                # Highlight selected quarter dengan styling
+                if selected_quarter == value:
+                    button_style = "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold;"
+                else:
+                    button_style = ""
+                
                 if st.button(label, key=f"quarter_{label}", use_container_width=True):
                     st.session_state.selected_quarter = value
                     selected_quarter = value
+                    st.rerun()
         
         st.divider()
         
-        # Preview
+        # Preview - dengan card styling
         st.markdown("#### ✅ Preview:")
         
-        preview_col1, preview_col2, preview_col3 = st.columns(3)
+        # Calculate preview data
+        preview_df = df[df['Tahun'] == selected_tahun]
+        if selected_quarter is not None:
+            preview_df = preview_df[preview_df['Kuartal'] == selected_quarter]
         
-        with preview_col1:
+        # Display metrics dengan styling yang lebih baik
+        metric_col1, metric_col2, metric_col3 = st.columns(3)
+        
+        with metric_col1:
             st.metric("📅 Tahun", selected_tahun)
         
-        with preview_col2:
+        with metric_col2:
             if selected_quarter is None:
                 quarter_text = "Full Year"
             else:
                 quarter_text = f"Q{selected_quarter}"
             st.metric("📊 Kuartal", quarter_text)
         
-        with preview_col3:
-            # Calculate preview data
-            preview_df = df[df['Tahun'] == selected_tahun]
-            if selected_quarter is not None:
-                preview_df = preview_df[preview_df['Kuartal'] == selected_quarter]
-            
+        with metric_col3:
             st.metric("📦 Data", f"{len(preview_df):,} transaksi")
         
         st.divider()
         
-        # Open Dashboard Button
-        if st.button("📊 BUKA DASHBOARD", use_container_width=True, type="primary"):
-            st.session_state.dashboard_ready = True
-            st.rerun()
+        # Open Dashboard Button - dengan styling gradient
+        col_open1, col_open2, col_open3 = st.columns([1, 1, 1])
+        with col_open2:
+            if st.button("📊 BUKA DASHBOARD", use_container_width=True, type="primary"):
+                st.session_state.dashboard_ready = True
+                st.rerun()
     
     st.markdown("</div>", unsafe_allow_html=True)
 
