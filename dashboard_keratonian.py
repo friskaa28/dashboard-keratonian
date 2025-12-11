@@ -65,6 +65,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+
+
 # ============================================
 # HELPER FUNCTIONS
 # ============================================
@@ -205,7 +207,15 @@ if not st.session_state.dashboard_ready:
         if st.button("📊 BUKA DASHBOARD", use_container_width=True, type="primary"):
             st.session_state.dashboard_ready = True
             st.rerun()
-    
+
+        # Wrap metrics dalam div centered
+        st.markdown("""
+        <div style="text-align: center; width: 100%;">
+        """, unsafe_allow_html=True)
+        
+        # Metrics di sini
+        metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================
