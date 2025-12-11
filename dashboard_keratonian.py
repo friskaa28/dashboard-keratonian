@@ -48,11 +48,14 @@ st.markdown("""
         padding: 20px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         border: 1px solid #f0f0f0;
+        text-align: center;  ← Center align semua text di metrics
     }
     
     [data-testid="stDataFrame"] {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border-radius: 8px;
+        text-align: center !important;  ← Force center value/angka
+        justify-content: center !important;
     }
     
     .stTabs [data-baseweb="tab-list"] {
