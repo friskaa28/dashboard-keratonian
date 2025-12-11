@@ -93,9 +93,9 @@ def load_data(file_path):
 
 # Load data
 try:
-    df = load_data('Keratonian_anomalies_marked-CLEAN.csv')
+    df = load_data('Keratonian_anomalies_marked_CLEAN.csv')
 except FileNotFoundError:
-    st.error("❌ File 'Keratonian_anomalies_marked-CLEAN.csv' tidak ditemukan!")
+    st.error("❌ File 'Keratonian_anomalies_marked_CLEAN.csv' tidak ditemukan!")
     st.info("Pastikan file CSV ada di folder yang sama dengan script ini")
     st.stop()
 
