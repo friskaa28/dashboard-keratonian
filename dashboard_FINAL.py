@@ -48,6 +48,19 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # ============================================
+# HELPER FUNCTIONS
+# ============================================
+
+def format_rupiah(value):
+    """Format angka ke format Rupiah (Rp)"""
+    if value >= 1_000_000:
+        return f"Rp {value/1_000_000:.1f}M"
+    elif value >= 1_000:
+        return f"Rp {value/1_000:.0f}K"
+    else:
+        return f"Rp {value:,.0f}"
+
+# ============================================
 # LOAD & CACHE DATA
 # ============================================
 
