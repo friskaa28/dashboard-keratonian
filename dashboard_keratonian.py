@@ -15,12 +15,17 @@ from sklearn.metrics import accuracy_score
 
 warnings.filterwarnings('ignore')
 
+# Global Brand Colors (New Matching Gradient Palette)
+KERATONIAN_COLORS = ['#845EC2', '#2C73D2', '#0081CF', '#0089BA', '#008E9B', '#00BF7A']
+KERATONIAN_GRADIENT = [[0, '#845EC2'], [0.5, '#0089BA'], [1, '#00BF7A']]
+GLOBAL_GRADIENT_CSS = "linear-gradient(90deg, #845EC2 0%, #00BF7A 100%)"
+
 # ============================================
 # PAGE CONFIGURATION
 # ============================================
 
 st.set_page_config(
-    page_title="Keratonian Sales Dashboard",
+    page_title="KERATONIAN Business Performance Intelligence",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -29,27 +34,177 @@ st.set_page_config(
 # Custom styling
 st.markdown("""
     <style>
+    /* Main Layout */
     .main {
-        padding-top: 2rem;
+        padding-top: 5px !important;
     }
-    h1 {
-        color: #1f77b4;
-        text-align: center;
+    .main .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 0rem !important;
     }
-    h2 {
-        color: #1f77b4;
-        border-bottom: 2px solid #1f77b4;
-        padding-bottom: 10px;
+    
+    /* Premium Header */
+    .premium-header {
+        background: linear-gradient(90deg, #845EC2 0%, #00BF7A 100%);
+        padding: 25px 30px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-title-container {
+        display: flex;
+        align-items: center;
+    }
+    .header-icon {
+        font-size: 2.5rem;
+        margin-right: 15px;
+    }
+    .header-text h1 {
+        margin: 0;
+        padding: 0;
+        color: white;
+        text-align: left;
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    .header-text p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+    .quarter-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 15px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Typography Overrides */
+    h2, h3 {
+        padding-top: 1rem !important;
+        margin-top: 0 !important;
+    }
+    .stDivider {
+        margin-top: 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    /* Sidebar Styling */
+    /* Sidebar Styling - Reverted to White Background */
+    [data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #eee;
+    }
+    [data-testid="stSidebar"] .stMarkdown h3 {
+        color: #2C73D2 !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 5px !important;
+    }
+    [data-testid="stSidebar"] label {
+        color: #444 !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Sidebar Multiselect Chips (Eye-catching colors) */
+    span[data-baseweb="tag"] {
+        background-color: #845EC2 !important;
+        color: white !important;
+    }
+    .sidebar-logo-img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 85%;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Sidebar Widget Styling */
+    div[data-testid="stSidebar"] .stButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    /* Metric Card Styling */
+    div[data-testid="stMetricValue"] {
+        font-weight: 700 !important;
+    }
+    
+    /* Insight Cards Colors (Synced with Palette) */
+    .insight-card[style*="border-left-color: #5D3A1A"] { border-left-color: #845EC2 !important; }
+    .insight-card[style*="border-left-color: #A67C52"] { border-left-color: #2C73D2 !important; }
+    .insight-card[style*="border-left-color: #8B5E3C"] { border-left-color: #0089BA !important; }
+    .insight-card[style*="border-left-color: #4A3014"] { border-left-color: #00BF7A !important; }
+    
+    /* Welcome Setup Premium Revamp */
+    .stApp {
+        background-color: #ffffff;
     }
     .welcome-container {
-        text-align: center;
-        padding: 50px 20px;
+        display: none; /* Hide the marker div */
     }
-    .setup-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 40px;
-        border-radius: 15px;
-        color: white;
+    /* Target the main container on the landing page specifically */
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) {
+        background: white;
+        padding: 0px;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(132, 94, 194, 0.15);
+        border: 1px solid #E0E0E0;
+        margin-top: 30px;
+        overflow: hidden; /* Ensure image doesn't bleed out */
+    }
+    .setup-logo {
+        width: 150px;
+        margin-bottom: 20px;
+    }
+    .setup-title {
+        color: #845EC2;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        letter-spacing: -1px;
+    }
+    .setup-subtitle {
+        color: #2C73D2;
+        font-size: 1.1rem;
+        margin-bottom: 40px;
+        opacity: 0.8;
+    }
+    .setup-input-label {
+        color: #845EC2;
+        font-weight: 700;
+        text-align: left;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .stMultiSelect, .stSelectbox {
+        margin-bottom: 20px;
+    }
+    .enter-button button {
+        background: linear-gradient(90deg, #845EC2 0%, #00BF7A 100%) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: 15px 40px !important;
+        font-size: 1.2rem !important;
+        border-radius: 50px !important;
+        border: none !important;
+        box-shadow: 0 10px 20px rgba(132, 94, 194, 0.2) !important;
+        transition: transform 0.3s ease !important;
+    }
+    .enter-button button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 15px 30px rgba(0, 191, 122, 0.3) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -179,90 +334,82 @@ if 'dashboard_ready' not in st.session_state:
 # WELCOME/SETUP PAGE
 # ============================================
 
+# ============================================
+# WELCOME/SETUP PAGE (PREMIUM REVAMP)
+# ============================================
+
 if not st.session_state.dashboard_ready:
-    st.markdown("<div class='welcome-container'>", unsafe_allow_html=True)
+    # Spacer at the top
+    # Spacer at the top
+    st.write("<br>", unsafe_allow_html=True)
     
-    # Header
-    st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
-    st.markdown("### 🔧 Setup Dashboard")
-    st.markdown("**Pilih Tahun & Kuartal untuk analisis**")
+    # Main Card Container with marker
+    st.markdown("<div class='split-hero-card'></div>", unsafe_allow_html=True)
     
-    st.divider()
+    col1, col2 = st.columns([1.2, 1])
     
-    # Setup form
-    col1, col2, col3 = st.columns([1, 2, 1])
+    with col1:
+        st.image("assets/image (1).png", use_container_width=True)
     
     with col2:
-        # Tahun Selection
-        st.markdown("#### 📅 Pilih Tahun (Bisa pilih lebih dari satu):")
+        st.markdown("<div style='padding: 30px 20px;'>", unsafe_allow_html=True)
+        
+        # Logo & Branding
+        st.image("assets/logo_official.svg", width=200)
+        st.markdown("<h1 class='setup-title' style='font-size: 2rem;'>BUSINESS INTELLIGENCE</h1>", unsafe_allow_html=True)
+        st.markdown("<p class='setup-subtitle' style='font-size: 1rem; margin-bottom: 20px;'>Siapkan periode data untuk eksplorasi performa bisnis Keratonian.</p>", unsafe_allow_html=True)
+        
+        st.markdown("<hr style='border: 0.5px solid #E5D3B3; margin-top: 15px; margin-bottom: 20px;'>", unsafe_allow_html=True)
+        
+        # Setup form
         tahun_list = sorted(df['Tahun'].unique())
         
+        st.markdown("<span class='setup-input-label'>📅 Pilih Tahun</span>", unsafe_allow_html=True)
         selected_tahun = st.multiselect(
-            "Pilih Tahun untuk dianalisis:",
-            tahun_list,
+            "Tahun", 
+            tahun_list, 
             default=st.session_state.selected_tahun,
             label_visibility="collapsed"
         )
-        st.session_state.selected_tahun = selected_tahun
         
-        st.divider()
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
         
-        # Kuartal Selection
-        st.markdown("#### 📊 Pilih Kuartal:")
-        quarter_cols = st.columns(5)
+        st.markdown("<span class='setup-input-label'>📊 Pilih Kuartal</span>", unsafe_allow_html=True)
+        selected_quarter_option = st.selectbox(
+            "Kuartal", 
+            ["Semua (Full Year)", "Q1 (Jan-Mar)", "Q2 (Apr-Jun)", "Q3 (Jul-Sep)", "Q4 (Okt-Des)"],
+            label_visibility="collapsed"
+        )
         
-        quarters = [
-            ("Q1", 1),
-            ("Q2", 2),
-            ("Q3", 3),
-            ("Q4", 4),
-            ("FULL YEAR", None)
-        ]
+        # Map choice
+        if selected_quarter_option == "Semua (Full Year)":
+            selected_quarter = None
+        else:
+            selected_quarter = int(selected_quarter_option[1])
         
-        selected_quarter = st.session_state.selected_quarter
-        for col, (label, value) in zip(quarter_cols, quarters):
-            with col:
-                btn_type = "primary" if selected_quarter == value else "secondary"
-                if st.button(label, key=f"quarter_{label}", use_container_width=True, type=btn_type):
-                    st.session_state.selected_quarter = value
-                    st.rerun()
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        st.divider()
-        
-        # Preview
-        st.markdown("#### ✅ Preview:")
-        
-        preview_col1, preview_col2, preview_col3 = st.columns(3)
-        
-        with preview_col1:
+        # Enter Action
+        st.markdown("<div class='enter-button'>", unsafe_allow_html=True)
+        if st.button("🚀 MULAI ANALISIS SEKARANG"):
             if not selected_tahun:
-                st.error("Pilih minimal 1 tahun")
-                st.stop()
-            st.metric("📅 Tahun", f"{len(selected_tahun)} Tahun")
-        
-        with preview_col2:
-            if selected_quarter is None:
-                quarter_text = "Full Year"
+                st.error("Silakan pilih minimal satu tahun!")
             else:
-                quarter_text = f"Q{selected_quarter}"
-            st.metric("📊 Kuartal", quarter_text)
+                st.session_state.selected_tahun = selected_tahun
+                st.session_state.selected_quarter = selected_quarter
+                st.session_state.dashboard_ready = True
+                st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
         
-        with preview_col3:
-            # Calculate preview data
-            preview_df = df[df['Tahun'].isin(selected_tahun)]
-            if selected_quarter is not None:
-                preview_df = preview_df[preview_df['Kuartal'] == selected_quarter]
-            
-            st.metric("📦 Data", f"{len(preview_df):,} transaksi")
+        st.markdown("<p style='margin-top: 15px; color: #5D3A1A; font-size: 0.8rem; font-style: italic;'>Atau gunakan akses cepat:</p>", unsafe_allow_html=True)
         
-        st.divider()
-        
-        # Open Dashboard Button
-        if st.button("📊 BUKA DASHBOARD", use_container_width=True, type="primary"):
+        if st.button("🌟 FULL YEAR ANALYSIS", use_container_width=True):
+            st.session_state.selected_tahun = tahun_list
+            st.session_state.selected_quarter = None
             st.session_state.dashboard_ready = True
             st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+            
+        st.markdown("</div>", unsafe_allow_html=True) # End Right Column Padding
 
 # ============================================
 # MAIN DASHBOARD (After Setup)
@@ -283,8 +430,9 @@ else:
     else:
         quarter_label = f"Full Year ({years_str})"
     
-    # Back button in sidebar
-    st.sidebar.title("🎛️ DASHBOARD")
+    # Back button and Logo in sidebar
+    st.sidebar.image("assets/logo_official.svg", use_container_width=True)
+    
     if st.sidebar.button("🔙 Kembali ke Setup", use_container_width=True):
         st.session_state.dashboard_ready = False
         st.rerun()
@@ -324,15 +472,23 @@ else:
     st.sidebar.metric("📊 Data Ditampilkan", f"{len(filtered_df):,} transaksi")
     
     # ============================================
-    # MAIN HEADER
+    # MAIN HEADER (PREMIUM REVAMP)
     # ============================================
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("# 📊 KERATONIAN SALES DASHBOARD")
-        st.markdown(f"### {quarter_label}")
-    
-    st.divider()
+    st.markdown(f"""
+        <div class="premium-header">
+            <div class="header-title-container">
+                <div class="header-icon">📊</div>
+                <div class="header-text">
+                    <h1>KERATONIAN SALES DASHBOARD</h1>
+                    <p>Business Insights & Analytics Platform</p>
+                </div>
+            </div>
+            <div class="quarter-badge">
+                📍 {quarter_label}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     # ============================================
     # KEY METRICS
@@ -446,7 +602,7 @@ else:
                     y=top_5_qty.values,
                     labels={'x': 'Produk', 'y': 'Total Qty'},
                     color=top_5_qty.values,
-                    color_continuous_scale='RdBu'
+                    color_continuous_scale=KERATONIAN_GRADIENT
                 )
                 fig_qty.update_layout(showlegend=False, height=350)
                 st.plotly_chart(fig_qty, use_container_width=True)
@@ -458,7 +614,7 @@ else:
                     values=rev_channel.values,
                     names=rev_channel.index,
                     hole=0.4,
-                    color_discrete_sequence=px.colors.qualitative.Pastel
+                    color_discrete_sequence=KERATONIAN_COLORS
                 )
                 fig_channel.update_layout(height=350)
                 st.plotly_chart(fig_channel, use_container_width=True)
@@ -508,7 +664,7 @@ else:
             
             with ins_col1:
                 st.markdown(f"""
-                <div class="insight-card" style="border-left-color: #1f77b4;">
+                <div class="insight-card" style="border-left-color: #5D3A1A;">
                     <div class="insight-title"><span class="insight-icon">📱</span> Dominasi Channel</div>
                     <div class="insight-text">
                         Channel <b>{top_channel}</b> adalah kontributor pendapatan utama. Disarankan untuk memperkuat strategi promosi khusus di platform ini.
@@ -517,7 +673,7 @@ else:
                 """, unsafe_allow_html=True)
                 
                 st.markdown(f"""
-                <div class="insight-card" style="border-left-color: #ff7f0e;">
+                <div class="insight-card" style="border-left-color: #A67C52;">
                     <div class="insight-title"><span class="insight-icon">⭐</span> Star Product</div>
                     <div class="insight-text">
                         Produk <b>{top_product}</b> memiliki kecepatan penjualan (velocity) tertinggi. Pastikan ketersediaan stok di gudang tetap aman.
@@ -527,7 +683,7 @@ else:
 
             with ins_col2:
                 st.markdown(f"""
-                <div class="insight-card" style="border-left-color: #2ca02c;">
+                <div class="insight-card" style="border-left-color: #8B5E3C;">
                     <div class="insight-title"><span class="insight-icon">📦</span> Strategi Cross-Selling</div>
                     <div class="insight-text">
                         Analisis menunjukkan pembeli <i>Hampers</i> seringkali tertarik pada <i>Tatakan Dupa</i>. Sangat potensial untuk promo paket bundling.
@@ -536,7 +692,7 @@ else:
                 """, unsafe_allow_html=True)
                 
                 st.markdown(f"""
-                <div class="insight-card" style="border-left-color: #9467bd;">
+                <div class="insight-card" style="border-left-color: #4A3014;">
                     <div class="insight-title"><span class="insight-icon">🔮</span> Predictor Status</div>
                     <div class="insight-text">
                         Model AI kami memiliki akurasi <b>{model_acc:.1%}</b> dalam memprediksi nilai transaksi. Gunakan tab <b>Prediction</b> untuk simulasi.
@@ -559,7 +715,7 @@ else:
                     corr_matrix,
                     text_auto=".2f",
                     aspect="auto",
-                    color_continuous_scale='RdBu_r',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
                     labels=dict(color="Correlation Score")
                 )
                 fig_corr.update_layout(
@@ -591,7 +747,7 @@ else:
                     color='Kategori Channel',
                     barmode='group',
                     title="Proporsi Produk Terlaris per Segmen Pelanggan",
-                    color_discrete_sequence=px.colors.qualitative.Antique
+                    color_discrete_sequence=KERATONIAN_COLORS
                 )
                 fig_seg_drill.update_layout(height=400)
                 st.plotly_chart(fig_seg_drill, use_container_width=True)
@@ -657,7 +813,8 @@ else:
             with col_left:
                 st.write("### By Quantity")
                 fig, ax = plt.subplots(figsize=(10, 6))
-                best_qty['Unit'].head(8).plot(kind='bar', ax=ax, color='steelblue')
+                # Use primary brand color for bars: #845EC2
+                best_qty['Unit'].head(8).plot(kind='bar', ax=ax, color='#845EC2')
                 ax.set_title('Top 8 Produk', fontweight='bold')
                 ax.set_ylabel('Unit Terjual')
                 plt.xticks(rotation=45, ha='right')
@@ -673,7 +830,8 @@ else:
                         x=best_revenue.values,
                         y=best_revenue.index,
                         orientation='h',
-                        marker=dict(color=best_revenue.values, colorscale='RdBu'),
+                        # Update colorscale to brand gradient
+                        marker=dict(color=best_revenue.values, colorscale=KERATONIAN_GRADIENT),
                         hovertemplate='<b>%{y}</b><br>Revenue: %{text}<extra></extra>',
                         text=[format_rupiah(v) for v in best_revenue.values]
                     )
@@ -748,6 +906,9 @@ else:
                 # Map to Indonesian
                 trend_data['Bulan_Label'] = trend_data['Bulan_Nama'].map(indo_months)
                 
+                # Convert Tahun to string to remove comma in legend
+                trend_data['Tahun'] = trend_data['Tahun'].astype(str)
+                
                 fig = px.line(
                     trend_data,
                     x='Bulan_Label',
@@ -755,7 +916,8 @@ else:
                     color='Tahun',
                     markers=True,
                     labels={metric_col: 'Value', 'Bulan_Label': 'Bulan'},
-                    title=f"Tren {trend_metric} - {trend_cust_type}"
+                    title=f"Tren {trend_metric} - {trend_cust_type}",
+                    color_discrete_sequence=KERATONIAN_COLORS
                 )
                 
                 fig.update_layout(
@@ -790,6 +952,9 @@ else:
             # Group by Year and Day
             weekly_comp = daily_data.groupby(['Tahun', 'Hari_Label'])['Total Penjualan'].sum().reset_index()
             
+            # Convert Tahun to string to remove comma in legend
+            weekly_comp['Tahun'] = weekly_comp['Tahun'].astype(str)
+            
             fig_daily = px.bar(
                 weekly_comp,
                 x='Hari_Label',
@@ -798,7 +963,7 @@ else:
                 barmode='group',
                 title='Perbandingan Penjualan Per Hari',
                 labels={'Hari_Label': 'Hari', 'Total Penjualan': 'Revenue (Rp)'},
-                color_discrete_sequence=px.colors.qualitative.Pastel
+                color_discrete_sequence=KERATONIAN_COLORS
             )
             
             fig_daily.update_layout(
@@ -838,14 +1003,16 @@ else:
 
             cust_analysis = cust_df.groupby('Cust').agg({
                 'Pesanan': 'count',
-                'Total Penjualan': 'sum'
+                'Total Penjualan': 'sum',
+                'Kategori Channel': 'first'
             }).sort_values('Total Penjualan', ascending=False)
-            cust_analysis.columns = ['Frequency', 'Monetary']
+            cust_analysis.columns = ['Frequency', 'Monetary', 'Tipe Pelanggan']
             
             col_left, col_right = st.columns(2)
             
             with col_left:
                 st.write("### Top 10 by Frequency")
+                st.caption("Menampilkan pelanggan yang paling sering berbelanja (berdasarkan jumlah transaksi).")
                 top_freq = cust_analysis['Frequency'].nlargest(10).reset_index()
                 
                 fig_freq = px.bar(
@@ -854,7 +1021,7 @@ else:
                     y='Cust',
                     orientation='h',
                     color='Frequency',
-                    color_continuous_scale='RdBu',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
                     text_auto=True
                 )
                 fig_freq.update_layout(
@@ -867,6 +1034,7 @@ else:
             
             with col_right:
                 st.write("### Top 10 by Spending")
+                st.caption("Menampilkan pelanggan dengan total pengeluaran/belanja terbesar (dalam Rupiah).")
                 top_monetary = cust_analysis['Monetary'].nlargest(10).reset_index()
                 
                 fig_spent = px.bar(
@@ -875,7 +1043,7 @@ else:
                     y='Cust',
                     orientation='h',
                     color='Monetary',
-                    color_continuous_scale='RdBu',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
                     text_auto='.2s'
                 )
                 fig_spent.update_layout(
@@ -895,7 +1063,7 @@ else:
                 x='Kategori Channel',
                 y='Total Penjualan',
                 color='Kategori Channel',
-                color_discrete_sequence=px.colors.qualitative.Prism,
+                color_discrete_sequence=KERATONIAN_COLORS,
                 text_auto='.2s'
             )
             fig_type.update_layout(height=400, showlegend=False)
@@ -903,7 +1071,7 @@ else:
             
             st.write("### Detail Transaksi Customer")
             # Format monetary column for display
-            cust_analysis_display = cust_analysis.copy()
+            cust_analysis_display = cust_analysis[['Tipe Pelanggan', 'Frequency', 'Monetary']].copy()
             cust_analysis_display['Monetary'] = cust_analysis_display['Monetary'].apply(format_rupiah)
             st.dataframe(cust_analysis_display.head(15), use_container_width=True)
         
@@ -916,7 +1084,7 @@ else:
             
             # --- LOCAL CUSTOMER TYPE FILTER ---
             geo_cust_filter = st.radio(
-                "👤 Tipe Pelanggan (Geographic):",
+                "👤 Tipe Pelanggan (Geographic)",
                 ["Semua", "End User", "Reseller"],
                 horizontal=True,
                 key="geo_cust_filter"
@@ -944,7 +1112,7 @@ else:
                     y='Provinsi',
                     orientation='h',
                     color='Total Penjualan',
-                    color_continuous_scale='RdBu',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
                     text_auto='.2s'
                 )
                 fig_prov.update_layout(
@@ -965,7 +1133,7 @@ else:
                     y='Daerah',
                     orientation='h',
                     color='Total Penjualan',
-                    color_continuous_scale='RdBu',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
                     text_auto='.2s'
                 )
                 fig_dist.update_layout(
@@ -1032,7 +1200,93 @@ else:
                             
                         st.caption(f"Median Threshold: {format_rupiah(median_threshold)}")
                     except Exception as e:
+                        st.caption(f"Median Threshold: {format_rupiah(median_threshold)}")
+                    except Exception as e:
                         st.error(f"Error in prediction: {e}")
+
+            st.divider()
+            
+            # --- FORECASTING SECTION ---
+            st.subheader("📊 Analisis Tren & Forecasting (Beta)")
+            st.info("Visualisasi tren penjualan kumulatif berdasarkan data historis, ditambah dengan proyeksi tren sederhana untuk 3 bulan ke depan.")
+            
+            # 1. Prepare Data for Time Series
+            forecast_df = filtered_df.copy()
+            # Ensure sorting by date
+            forecast_df = forecast_df.sort_values('Tanggal Order')
+            
+            # Resample to Monthly Sales
+            monthly_sales = forecast_df.set_index('Tanggal Order').resample('M')['Total Penjualan'].sum().reset_index()
+            monthly_sales['Bulan'] = monthly_sales['Tanggal Order'].dt.strftime('%b %Y')
+            monthly_sales['Type'] = 'Historical'
+            
+            if len(monthly_sales) > 1:
+                # 2. Calculate Simple Moving Average (Trend) - 3 Month Window
+                monthly_sales['MA_3'] = monthly_sales['Total Penjualan'].rolling(window=3, min_periods=1).mean()
+                
+                # 3. Generate Simple Forecast (Linear Projection based on last avg growth)
+                last_date = monthly_sales['Tanggal Order'].iloc[-1]
+                last_ma = monthly_sales['MA_3'].iloc[-1]
+                
+                # Calculate average monthly growth rate from the last 6 months (or less)
+                if len(monthly_sales) >= 4:
+                    recent = monthly_sales.tail(4)
+                    start_val = recent['MA_3'].iloc[0]
+                    end_val = recent['MA_3'].iloc[-1]
+                    growth_rate = (end_val - start_val) / 3 # Simple slope
+                else:
+                    growth_rate = 0 # Flat forecast if not enough data
+                
+                future_dates = []
+                future_vals = []
+                
+                for i in range(1, 4): # Forecast next 3 months
+                    next_date = last_date + pd.DateOffset(months=i)
+                    next_val = last_ma + (growth_rate * i)
+                    future_dates.append(next_date)
+                    future_vals.append(max(0, next_val)) # No negative sales directly
+                
+                forecast_data = pd.DataFrame({
+                    'Tanggal Order': future_dates,
+                    'Total Penjualan': future_vals,
+                    'Type': 'Forecast (Est)'
+                })
+                forecast_data['Bulan'] = forecast_data['Tanggal Order'].dt.strftime('%b %Y')
+                
+                # Combine
+                combined_forecast = pd.concat([monthly_sales, forecast_data], ignore_index=True)
+                
+                # Plot
+                fig_forecast = px.line(
+                    combined_forecast,
+                    x='Bulan',
+                    y='Total Penjualan',
+                    color='Type',
+                    markers=True,
+                    title='Tren Penjualan Historis & Prediksi Terusan (Forecast 3 Bulan Depan)',
+                    labels={'Total Penjualan': 'Sales Revenue', 'Bulan': 'Bulan'},
+                    color_discrete_map={'Historical': '#845EC2', 'Forecast (Est)': '#00BF7A'}
+                )
+                
+                # Add trendline styling
+                fig_forecast.update_traces(line=dict(width=3))
+                # Make forecast dashed
+                fig_forecast.for_each_trace(
+                    lambda trace: trace.update(line=dict(dash='dot')) if trace.name == 'Forecast (Est)' else trace.update(line=dict(dash='solid'))
+                )
+                
+                st.plotly_chart(fig_forecast, use_container_width=True)
+                
+                # Narasi Forecast
+                if growth_rate > 0:
+                    st.success("📈 **Tren Positif:** Berdasarkan data terakhir, penjualan menunjukkan tren kenaikan rata-rata. Proyeksi 3 bulan ke depan optimis.")
+                elif growth_rate < 0:
+                    st.warning("📉 **Tren Menurun:** Terdeteksi penurunan pada rata-rata penjualan 3 bulan terakhir. Perlu strategi boosting untuk bulan depan.")
+                else:
+                    st.info("➡️ **Tren Stabil:** Penjualan relatif stabil. Pertahankan performa.")
+                    
+            else:
+                st.warning("⚠️ Data belum cukup untuk melakukan forecasting (Minimal butuh > 1 bulan data).")
 
 
         # ============================================
@@ -1047,7 +1301,7 @@ else:
                 col_g1, col_g2, col_g3 = st.columns(3)
                 with col_g1:
                     st.markdown("""
-                    **🔥 High (Rame)**
+                    **🔥 High (Ramai)**
                     *   **Kriteria:** Penjualan > 20 unit.
                     *   **Aksi:** Stok melimpah, prioritaskan ketersediaan.
                     """)
@@ -1102,20 +1356,20 @@ else:
             }).reset_index()
             
             # 2. Klasifikasi Kondisi Pasar (Logic from Notebook)
-            # High (Rame): Qty > 20
+            # High (Ramai): Qty > 20
             # Medium (Normal): 10 < Qty <= 20
             # Low (Sepi): Qty <= 10
             
             def classify_market(qty):
                 if qty > 20:
-                    return "3. High (Rame)"
+                    return "3. High (Ramai)"
                 elif qty > 10:
                     return "2. Medium (Normal)"
                 else:
                     return "1. Low (Sepi)"
             
             def get_recommendation(market):
-                if market == "3. High (Rame)":
+                if market == "3. High (Ramai)":
                     return "URGENT! Stok Melimpah (>20)"
                 elif market == "2. Medium (Normal)":
                     return "Siaga, Stok Standar (Max 20)"
@@ -1131,7 +1385,7 @@ else:
             # Display metrics for summary
             m_col1, m_col2, m_col3 = st.columns(3)
             with m_col1:
-                st.metric("🔥 High Demand", len(stock_data[stock_data['Kondisi Pasar'] == "3. High (Rame)"]))
+                st.metric("🔥 High Demand", len(stock_data[stock_data['Kondisi Pasar'] == "3. High (Ramai)"]))
             with m_col2:
                 st.metric("⚖️ Normal Demand", len(stock_data[stock_data['Kondisi Pasar'] == "2. Medium (Normal)"]))
             with m_col3:
@@ -1139,17 +1393,17 @@ else:
             
             st.divider()
             
-            # Styling the dataframe
+            # Styling the dataframe (Updated with Brand Colors)
             def color_market(val):
-                if "High" in val: color = '#ff4b4b' # Red-ish
-                elif "Medium" in val: color = '#ffa500' # Orange
-                else: color = '#2e8b57' # SeaGreen
+                if "High" in val: color = '#845EC2' # Purple (Primary)
+                elif "Medium" in val: color = '#2C73D2' # Blue
+                else: color = '#00BF7A' # Teal
                 return f'background-color: {color}; color: white; font-weight: bold'
 
             def color_rec(val):
-                if "URGENT" in val: color = '#ff4b4b'
-                elif "Siaga" in val: color = '#ffa500'
-                else: color = '#2e8b57'
+                if "URGENT" in val: color = '#845EC2'
+                elif "Siaga" in val: color = '#2C73D2'
+                else: color = '#00BF7A'
                 return f'color: {color}; font-weight: bold'
 
             st.dataframe(
@@ -1189,17 +1443,28 @@ else:
                     'By_Channel': filtered_df.groupby('Channel').agg({'Total Penjualan': 'sum', 'Qty': 'sum'}),
                 }
                 
-                with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                    for sheet_name, df_sheet in export_sheets.items():
-                        df_sheet.to_excel(writer, sheet_name=sheet_name[:31])
-                
-                st.download_button(
-                    label="⬇️ Download Excel",
-                    data=output.getvalue(),
-                    file_name=f"Dashboard_Keratonian_{selected_tahun}_{quarter_label.replace(' ', '_')}.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
+                try:
+                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                        for sheet_name, df_sheet in export_sheets.items():
+                            df_sheet.to_excel(writer, sheet_name=sheet_name[:31])
+                    
+                    excel_data = output.getvalue()
+                    
+                    st.download_button(
+                        label="⬇️ Download Excel",
+                        data=excel_data,
+                        file_name=f"Dashboard_Keratonian_{selected_tahun}_{quarter_label.replace(' ', '_')}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True
+                    )
+                except OSError as e:
+                    if e.errno == 28: # No space left on device
+                        st.error("❌ Gagal membuat Excel: Penyimpanan Penuh (Disk Full).")
+                        st.info("⚠️ Silakan gunakan opsi **Download CSV** di sebelah kanan, karena file CSV jauh lebih ringan dan tidak memerlukan ruang temporary yang besar.")
+                    else:
+                        st.error(f"❌ Gagal membuat Excel (IO Error): {e}")
+                except Exception as e:
+                    st.error(f"❌ Terjadi kesalahan saat export Excel: {e}")
             
             with col2:
                 # CSV Export
@@ -1217,8 +1482,9 @@ else:
             st.divider()
             st.write("### Preview Data (100 rows)")
             
-            # Format revenue for preview
+            # Format revenue and date for preview
             preview_df = filtered_df[['Tanggal Order', 'Channel', 'Cust', 'Pesanan', 'Qty', 'Total Penjualan', 'Provinsi', 'Daerah']].head(100).copy()
+            preview_df['Tanggal Order'] = pd.to_datetime(preview_df['Tanggal Order']).dt.date
             preview_df['Total Penjualan'] = preview_df['Total Penjualan'].apply(format_rupiah)
             st.dataframe(preview_df, use_container_width=True)
     
