@@ -157,7 +157,7 @@ def train_prediction_model(df):
 
 # Load data
 try:
-    df = load_data('Keratonian_dataset_clean(Keratonian_anomalies_marked(CLE).csv')
+    df = load_data('Keratonian_anomalies_marked(CLEAN) (1)(Keratonian_anomalies_marked(CLE).csv')
 except FileNotFoundError:
     st.error("❌ File 'Keratonian_anomalies_marked_CLEAN.csv' tidak ditemukan!")
     st.info("Pastikan file CSV ada di folder yang sama dengan script ini")
