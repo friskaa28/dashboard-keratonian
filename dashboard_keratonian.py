@@ -153,17 +153,70 @@ st.markdown("""
         background-color: #ffffff;
     }
     .welcome-container {
-        display: none; /* Hide the marker div */
+        display: none;
     }
-    /* Target the main container on the landing page specifically */
+    
+    /* Main Welcome Card */
     div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) {
         background: white;
-        padding: 0px;
-        border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(98, 42, 15, 0.15);
+        padding: 0px !important;
+        margin: 0px !important;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(98, 42, 15, 0.12);
         border: 1px solid #E0E0E0;
-        margin-top: 30px;
-        overflow: hidden; /* Ensure image doesn't bleed out */
+        margin-top: 20px !important;
+        overflow: hidden;
+    }
+    
+    /* AGGRESSIVE: Remove ALL padding/margin from columns */
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stHorizontalBlock"] {
+        gap: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Target EVERY nested element in left column */
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:first-child,
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:first-child *,
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:first-child > div,
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:first-child > div > div,
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:first-child > div > div > div {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Image Container - Full Height with Flex */
+    .hero-image-column {
+        padding: 0 !important;
+        margin: 0 !important;
+        line-height: 0 !important;
+        height: 100% !important;
+        display: flex !important;
+        width: 100% !important;
+    }
+    .hero-image-column img {
+        object-fit: cover !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 650px !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex: 1 !important;
+    }
+    
+    /* Right Column - Form Side */
+    div[data-testid="stVerticalBlock"]:has(> div > div > .split-hero-card) div[data-testid="stColumn"]:last-child {
+        background: white;
+        display: flex;
+        align-items: center;
+        padding: 0 !important;
+    }
+    
+    /* Form Container */
+    .form-container {
+        padding: 40px 35px;
+        width: 100%;
     }
     .setup-logo {
         width: 150px;
@@ -359,20 +412,18 @@ if 'dashboard_ready' not in st.session_state:
 # ============================================
 
 if not st.session_state.dashboard_ready:
-    # Spacer at the top
-    # Spacer at the top
-    st.write("<br>", unsafe_allow_html=True)
-    
     # Main Card Container with marker
     st.markdown("<div class='split-hero-card'></div>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1.2, 1])
+    col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.image("assets/2 (1).png", use_container_width=True)
+        st.markdown("<div class='hero-image-column' style='padding:0!important;margin:0!important;line-height:0;height:100%;display:flex;width:100%;'>", unsafe_allow_html=True)
+        st.image("assets/keratonian.jpeg", use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown("<div style='padding: 30px 20px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         
         # Logo & Branding
         st.image("assets/logo_official.svg", width=200)
@@ -429,7 +480,7 @@ if not st.session_state.dashboard_ready:
             st.session_state.dashboard_ready = True
             st.rerun()
             
-        st.markdown("</div>", unsafe_allow_html=True) # End Right Column Padding
+        st.markdown("</div>", unsafe_allow_html=True) # End form-container
 
 # ============================================
 # MAIN DASHBOARD (After Setup)
