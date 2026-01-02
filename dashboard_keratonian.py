@@ -15,10 +15,11 @@ from sklearn.metrics import accuracy_score
 
 warnings.filterwarnings('ignore')
 
-# Global Brand Colors (New Matching Gradient Palette)
-KERATONIAN_COLORS = ['#845EC2', '#2C73D2', '#0081CF', '#0089BA', '#008E9B', '#00BF7A']
-KERATONIAN_GRADIENT = [[0, '#845EC2'], [0.5, '#0089BA'], [1, '#00BF7A']]
-GLOBAL_GRADIENT_CSS = "linear-gradient(90deg, #845EC2 0%, #00BF7A 100%)"
+# Global Brand Colors (New Brown Gradient Palette)
+# Palette: Cinnamon, Brown, Tortilla, Russet, Coffee, Brunette
+KERATONIAN_COLORS = ['#622A0F', '#7C4700', '#997950', '#7F461B', '#4B3619', '#3A1F04', '#795C32', '#5C2C06']
+KERATONIAN_GRADIENT = [[0, '#3A1F04'], [0.5, '#7C4700'], [1, '#997950']]
+GLOBAL_GRADIENT_CSS = "linear-gradient(90deg, #622A0F 0%, #997950 100%)"
 
 # ============================================
 # PAGE CONFIGURATION
@@ -45,7 +46,7 @@ st.markdown("""
     
     /* Premium Header */
     .premium-header {
-        background: linear-gradient(90deg, #845EC2 0%, #00BF7A 100%);
+        background: linear-gradient(90deg, #622A0F 0%, #997950 100%);
         padding: 25px 30px;
         border-radius: 12px;
         color: white;
@@ -104,7 +105,7 @@ st.markdown("""
         border-right: 1px solid #eee;
     }
     [data-testid="stSidebar"] .stMarkdown h3 {
-        color: #2C73D2 !important;
+        color: #7C4700 !important;
         font-weight: 700 !important;
         font-size: 1.1rem !important;
         margin-bottom: 5px !important;
@@ -114,11 +115,11 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Sidebar Multiselect Chips (Eye-catching colors) */
-    span[data-baseweb="tag"] {
-        background-color: #845EC2 !important;
-        color: white !important;
-    }
+    /* Sidebar Multiselect Chips (Diverse Brown Palette) */
+    span[data-baseweb="tag"]:nth-of-type(4n+1) { background-color: #622A0F !important; color: white !important; }
+    span[data-baseweb="tag"]:nth-of-type(4n+2) { background-color: #7C4700 !important; color: white !important; }
+    span[data-baseweb="tag"]:nth-of-type(4n+3) { background-color: #997950 !important; color: white !important; }
+    span[data-baseweb="tag"]:nth-of-type(4n+4) { background-color: #5C2C06 !important; color: white !important; }
     .sidebar-logo-img {
         display: block;
         margin-left: auto;
@@ -142,10 +143,10 @@ st.markdown("""
     }
     
     /* Insight Cards Colors (Synced with Palette) */
-    .insight-card[style*="border-left-color: #5D3A1A"] { border-left-color: #845EC2 !important; }
-    .insight-card[style*="border-left-color: #A67C52"] { border-left-color: #2C73D2 !important; }
-    .insight-card[style*="border-left-color: #8B5E3C"] { border-left-color: #0089BA !important; }
-    .insight-card[style*="border-left-color: #4A3014"] { border-left-color: #00BF7A !important; }
+    .insight-card[style*="border-left-color: #5D3A1A"] { border-left-color: #622A0F !important; }
+    .insight-card[style*="border-left-color: #A67C52"] { border-left-color: #997950 !important; }
+    .insight-card[style*="border-left-color: #8B5E3C"] { border-left-color: #7C4700 !important; }
+    .insight-card[style*="border-left-color: #4A3014"] { border-left-color: #3A1F04 !important; }
     
     /* Welcome Setup Premium Revamp */
     .stApp {
@@ -159,7 +160,7 @@ st.markdown("""
         background: white;
         padding: 0px;
         border-radius: 24px;
-        box-shadow: 0 20px 50px rgba(132, 94, 194, 0.15);
+        box-shadow: 0 20px 50px rgba(98, 42, 15, 0.15);
         border: 1px solid #E0E0E0;
         margin-top: 30px;
         overflow: hidden; /* Ensure image doesn't bleed out */
@@ -169,20 +170,20 @@ st.markdown("""
         margin-bottom: 20px;
     }
     .setup-title {
-        color: #845EC2;
+        color: #622A0F;
         font-size: 2.5rem;
         font-weight: 800;
         margin-bottom: 15px;
         letter-spacing: -1px;
     }
     .setup-subtitle {
-        color: #2C73D2;
+        color: #333333;
         font-size: 1.1rem;
         margin-bottom: 40px;
-        opacity: 0.8;
+        opacity: 0.9;
     }
     .setup-input-label {
-        color: #845EC2;
+        color: #622A0F;
         font-weight: 700;
         text-align: left;
         margin-bottom: 10px;
@@ -192,19 +193,36 @@ st.markdown("""
         margin-bottom: 20px;
     }
     .enter-button button {
-        background: linear-gradient(90deg, #845EC2 0%, #00BF7A 100%) !important;
+        background: linear-gradient(90deg, #622A0F 0%, #997950 100%) !important;
         color: white !important;
         font-weight: 700 !important;
         padding: 15px 40px !important;
         font-size: 1.2rem !important;
         border-radius: 50px !important;
         border: none !important;
-        box-shadow: 0 10px 20px rgba(132, 94, 194, 0.2) !important;
+        box-shadow: 0 10px 20px rgba(98, 42, 15, 0.2) !important;
         transition: transform 0.3s ease !important;
     }
     .enter-button button:hover {
         transform: translateY(-3px) !important;
-        box-shadow: 0 15px 30px rgba(0, 191, 122, 0.3) !important;
+        box-shadow: 0 15px 30px rgba(153, 121, 80, 0.3) !important;
+    }
+    
+    /* Tab Styling - Brown Active Indicator */
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        border-bottom-color: #622A0F !important;
+        color: #622A0F !important;
+    }
+    .stTabs [data-baseweb="tab-list"] button:hover {
+        color: #7C4700 !important;
+    }
+    
+    /* Override Streamlit Red Accents to Brown */
+    .stAlert, [data-testid="stNotification"] {
+        border-left-color: #622A0F !important;
+    }
+    a, a:hover {
+        color: #622A0F !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -213,27 +231,29 @@ st.markdown("""
 # HELPER FUNCTIONS
 # ============================================
 
+
 def format_rupiah(value):
-    """Format angka ke format Rupiah (Rp) - versi Indonesia"""
+    """Format angka ke format Rupiah (Rp) - versi Indonesia dengan singkatan konsisten"""
     if value >= 1_000_000_000:
-        return f"Rp {value/1_000_000_000:.2f} Miliar"
+        return f"Rp {value/1_000_000_000:.2f} M"  # M = Miliar
     elif value >= 1_000_000:
-        return f"Rp {value/1_000_000:.1f} Juta"
+        return f"Rp {value/1_000_000:.1f} Jt"  # Jt = Juta
     elif value >= 1_000:
-        return f"Rp {value/1_000:.0f} Ribu"
+        return f"Rp {value/1_000:.0f} Rb"  # Rb = Ribu
     else:
         return f"Rp {value:,.0f}"
 
 def format_axis_label(value):
-    """Format angka untuk axis label di chart - tanpa 'Rp'"""
+    """Format angka untuk axis label di chart - tanpa 'Rp' tapi dengan keterangan"""
     if value >= 1_000_000_000:
-        return f"{value/1_000_000_000:.1f}M (Miliar)"
+        return f"{value/1_000_000_000:.1f} M"  # M = Miliar
     elif value >= 1_000_000:
-        return f"{value/1_000_000:.1f}J (Juta)"
+        return f"{value/1_000_000:.1f} Jt"  # Jt = Juta
     elif value >= 1_000:
-        return f"{value/1_000:.0f}R (Ribu)"
+        return f"{value/1_000:.0f} Rb"  # Rb = Ribu
     else:
         return f"{value:,.0f}"
+
 
 # ============================================
 # LOAD & CACHE DATA
@@ -440,7 +460,7 @@ else:
     st.sidebar.divider()
     
     # SIDEBAR FILTERS
-    st.sidebar.title("🎛️ FILTER TAMBAHAN")
+    st.sidebar.title("FILTER TAMBAHAN")
     
     # Channel Filter
     channels = sorted([c for c in dashboard_df['Channel'].unique() if c != 'Sample'])
@@ -459,7 +479,7 @@ else:
     )
     
     # Reset Button
-    if st.sidebar.button("🔄 Reset Filter", use_container_width=True):
+    if st.sidebar.button(" Reset Filter", use_container_width=True):
         st.rerun()
     
     # Apply Filters
@@ -469,7 +489,72 @@ else:
     ].copy()
     
     st.sidebar.divider()
-    st.sidebar.metric("📊 Data Ditampilkan", f"{len(filtered_df):,} transaksi")
+    st.sidebar.metric("Data Ditampilkan", f"{len(filtered_df):,} transaksi")
+    
+    # Website Button - Premium Design
+    st.sidebar.markdown("""
+        <style>
+        .website-container {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .website-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #622A0F 0%, #7C4700 50%, #997950 100%);
+            color: white !important;
+            text-decoration: none !important;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(98, 42, 15, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .website-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .website-button:hover::before {
+            left: 100%;
+        }
+        .website-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(98, 42, 15, 0.4);
+            text-decoration: none;
+            color: white !important;
+        }
+        .website-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        .website-icon {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .website-text {
+            font-size: 0.95rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        </style>
+        <div class="website-container">
+            <a href="https://keratonian-scent.com/" target="_blank" class="website-button">
+                <span class="website-icon">🌐</span>
+                <span class="website-text">Visit Keratonian Website</span>
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
     
     # ============================================
     # MAIN HEADER (PREMIUM REVAMP)
@@ -478,7 +563,7 @@ else:
     st.markdown(f"""
         <div class="premium-header">
             <div class="header-title-container">
-                <div class="header-icon">📊</div>
+                <div class="header-icon"></div>
                 <div class="header-text">
                     <h1>KERATONIAN SALES DASHBOARD</h1>
                     <p>Business Insights & Analytics Platform</p>
@@ -553,7 +638,7 @@ else:
         # ============================================
         
         with tab1:
-            st.subheader("📊 Sales Overview")
+            st.subheader("Sales Overview")
             
             # --- LOCAL CUSTOMER TYPE FILTER ---
             overview_cust_filter = st.radio(
@@ -572,25 +657,7 @@ else:
                 st.warning("Tidak ada data untuk filter yang dipilih.")
                 st.stop()
 
-            # Using ov_df for overview metrics
-            ov_metric_col1, ov_metric_col2, ov_metric_col3, ov_metric_col4 = st.columns(4)
             
-            with ov_metric_col1:
-                total_revenue = ov_df['Total Penjualan'].sum()
-                st.metric("💰 Total Revenue", format_rupiah(total_revenue))
-            
-            with ov_metric_col2:
-                total_qty = ov_df['Qty'].sum()
-                st.metric("📦 Total Unit", f"{total_qty:,.0f}")
-            
-            with ov_metric_col3:
-                unique_cust = ov_df['Cust'].nunique()
-                st.metric("👥 Customers", f"{unique_cust:,}")
-            
-            with ov_metric_col4:
-                st.metric("📦 Total Baris", f"{len(ov_df):,}")
-            
-            st.divider()
             
             col_chart1, col_chart2 = st.columns(2)
             
@@ -813,8 +880,13 @@ else:
             with col_left:
                 st.write("### By Quantity")
                 fig, ax = plt.subplots(figsize=(10, 6))
-                # Use primary brand color for bars: #845EC2
-                best_qty['Unit'].head(8).plot(kind='bar', ax=ax, color='#845EC2')
+                
+                # Use varied colors from palette for better differentiation
+                # Ensure we have enough colors for the bars
+                bar_count = len(best_qty['Unit'].head(8))
+                bar_colors = (KERATONIAN_COLORS * 2)[:bar_count]
+                
+                best_qty['Unit'].head(8).plot(kind='bar', ax=ax, color=bar_colors)
                 ax.set_title('Top 8 Produk', fontweight='bold')
                 ax.set_ylabel('Unit Terjual')
                 plt.xticks(rotation=45, ha='right')
@@ -887,6 +959,7 @@ else:
             # For multi-year we need data outside the current dashboard_df year filter
             # BUT we apply the other sidebar filters (Channel, Category)
             multi_year_df = df[
+                (df['Tahun'].isin(selected_tahun)) &
                 (df['Channel'].isin(selected_channels)) &
                 (df['Kategori'].isin(selected_categories)) &
                 (df['Kategori Channel'] == trend_cust_type)
@@ -917,7 +990,7 @@ else:
                     markers=True,
                     labels={metric_col: 'Value', 'Bulan_Label': 'Bulan'},
                     title=f"Tren {trend_metric} - {trend_cust_type}",
-                    color_discrete_sequence=KERATONIAN_COLORS
+                    color_discrete_sequence=['#622A0F', '#997950', '#7C4700', '#5C2C06', '#7F461B']
                 )
                 
                 fig.update_layout(
@@ -963,7 +1036,7 @@ else:
                 barmode='group',
                 title='Perbandingan Penjualan Per Hari',
                 labels={'Hari_Label': 'Hari', 'Total Penjualan': 'Revenue (Rp)'},
-                color_discrete_sequence=KERATONIAN_COLORS
+                color_discrete_sequence=['#622A0F', '#997950', '#7C4700']
             )
             
             fig_daily.update_layout(
@@ -1063,7 +1136,7 @@ else:
                 x='Kategori Channel',
                 y='Total Penjualan',
                 color='Kategori Channel',
-                color_discrete_sequence=KERATONIAN_COLORS,
+                color_discrete_sequence=['#622A0F', '#997950'],
                 text_auto='.2s'
             )
             fig_type.update_layout(height=400, showlegend=False)
@@ -1099,6 +1172,213 @@ else:
                 st.stop()
 
             st.markdown("Distribusi pendapatan berdasarkan wilayah (Provinsi & Kabupaten/Kota).")
+            
+            # --- INTERACTIVE INDONESIA MAP ---
+            st.write("### 🗺️ Peta Distribusi Penjualan Indonesia")
+            st.caption("Visualisasi geografis intensitas penjualan per provinsi. Ukuran bubble = revenue lebih tinggi.")
+            
+            # Prepare province-level data
+            province_sales = geo_df.groupby('Provinsi')['Total Penjualan'].sum().reset_index()
+            province_sales = province_sales.sort_values('Total Penjualan', ascending=False)
+            
+            # Manual coordinate mapping for major Indonesian provinces (with variations)
+            province_coords = {
+                # Jakarta variations
+                'DKI Jakarta': {'lat': -6.2088, 'lon': 106.8456},
+                'Jakarta': {'lat': -6.2088, 'lon': 106.8456},
+                'DKI JAKARTA': {'lat': -6.2088, 'lon': 106.8456},
+                
+                # Jawa Barat variations
+                'Jawa Barat': {'lat': -6.9175, 'lon': 107.6191},
+                'JAWA BARAT': {'lat': -6.9175, 'lon': 107.6191},
+                
+                # Jawa Tengah variations
+                'Jawa Tengah': {'lat': -7.1508, 'lon': 110.1403},
+                'JAWA TENGAH': {'lat': -7.1508, 'lon': 110.1403},
+                
+                # Jawa Timur variations
+                'Jawa Timur': {'lat': -7.5361, 'lon': 112.2384},
+                'JAWA TIMUR': {'lat': -7.5361, 'lon': 112.2384},
+                
+                # Banten variations
+                'Banten': {'lat': -6.4058, 'lon': 106.0640},
+                'BANTEN': {'lat': -6.4058, 'lon': 106.0640},
+                
+                # Yogyakarta variations
+                'DI Yogyakarta': {'lat': -7.7956, 'lon': 110.3695},
+                'Daerah Istimewa Yogyakarta': {'lat': -7.7956, 'lon': 110.3695},
+                'Yogyakarta': {'lat': -7.7956, 'lon': 110.3695},
+                'YOGYAKARTA': {'lat': -7.7956, 'lon': 110.3695},
+                'D.I. Yogyakarta': {'lat': -7.7956, 'lon': 110.3695},
+                'D.I YOGYAKARTA': {'lat': -7.7956, 'lon': 110.3695},
+                
+                # Bali variations
+                'Bali': {'lat': -8.3405, 'lon': 115.0920},
+                'BALI': {'lat': -8.3405, 'lon': 115.0920},
+                
+                # Sumatera Utara variations
+                'Sumatera Utara': {'lat': 3.5952, 'lon': 98.6722},
+                'SUMATERA UTARA': {'lat': 3.5952, 'lon': 98.6722},
+                'Sumatra Utara': {'lat': 3.5952, 'lon': 98.6722},
+                
+                # Sumatera Barat variations
+                'Sumatera Barat': {'lat': -0.7399, 'lon': 100.8000},
+                'SUMATERA BARAT': {'lat': -0.7399, 'lon': 100.8000},
+                'Sumatra Barat': {'lat': -0.7399, 'lon': 100.8000},
+                
+                # Sumatera Selatan variations
+                'Sumatera Selatan': {'lat': -3.3194, 'lon': 104.9147},
+                'SUMATERA SELATAN': {'lat': -3.3194, 'lon': 104.9147},
+                'Sumatra Selatan': {'lat': -3.3194, 'lon': 104.9147},
+                
+                # Lampung variations
+                'Lampung': {'lat': -5.4500, 'lon': 105.2667},
+                'LAMPUNG': {'lat': -5.4500, 'lon': 105.2667},
+                
+                # Riau variations
+                'Riau': {'lat': 0.2933, 'lon': 101.7068},
+                'RIAU': {'lat': 0.2933, 'lon': 101.7068},
+                
+                # Jambi variations
+                'Jambi': {'lat': -1.6101, 'lon': 103.6131},
+                'JAMBI': {'lat': -1.6101, 'lon': 103.6131},
+                
+                # Bengkulu variations
+                'Bengkulu': {'lat': -3.7928, 'lon': 102.2608},
+                'BENGKULU': {'lat': -3.7928, 'lon': 102.2608},
+                
+                # Aceh variations
+                'Aceh': {'lat': 4.6951, 'lon': 96.7494},
+                'ACEH': {'lat': 4.6951, 'lon': 96.7494},
+                'Nanggroe Aceh Darussalam': {'lat': 4.6951, 'lon': 96.7494},
+                'NANGGROE ACEH DARUSSALAM (NAD)': {'lat': 4.6951, 'lon': 96.7494},
+                'NAD': {'lat': 4.6951, 'lon': 96.7494},
+                
+                # Kepulauan Riau variations
+                'Kepulauan Riau': {'lat': 3.9457, 'lon': 108.1429},
+                'Kep. Riau': {'lat': 3.9457, 'lon': 108.1429},
+                'KEPULAUAN RIAU': {'lat': 3.9457, 'lon': 108.1429},
+                
+                # Bangka Belitung variations
+                'Kepulauan Bangka Belitung': {'lat': -2.7411, 'lon': 106.4406},
+                'Kep. Bangka Belitung': {'lat': -2.7411, 'lon': 106.4406},
+                'Bangka Belitung': {'lat': -2.7411, 'lon': 106.4406},
+                'BANGKA BELITUNG': {'lat': -2.7411, 'lon': 106.4406},
+                
+                # Kalimantan variations
+                'Kalimantan Barat': {'lat': -0.0263, 'lon': 109.3425},
+                'KALIMANTAN BARAT': {'lat': -0.0263, 'lon': 109.3425},
+                'Kalimantan Tengah': {'lat': -1.6815, 'lon': 113.3824},
+                'KALIMANTAN TENGAH': {'lat': -1.6815, 'lon': 113.3824},
+                'Kalimantan Selatan': {'lat': -3.0926, 'lon': 115.2838},
+                'KALIMANTAN SELATAN': {'lat': -3.0926, 'lon': 115.2838},
+                'Kalimantan Timur': {'lat': 0.5387, 'lon': 116.4194},
+                'KALIMANTAN TIMUR': {'lat': 0.5387, 'lon': 116.4194},
+                'Kalimantan Utara': {'lat': 3.0731, 'lon': 116.0413},
+                'KALIMANTAN UTARA': {'lat': 3.0731, 'lon': 116.0413},
+                
+                # Sulawesi variations
+                'Sulawesi Utara': {'lat': 0.6246, 'lon': 123.9750},
+                'SULAWESI UTARA': {'lat': 0.6246, 'lon': 123.9750},
+                'Sulawesi Tengah': {'lat': -1.4300, 'lon': 121.4456},
+                'SULAWESI TENGAH': {'lat': -1.4300, 'lon': 121.4456},
+                'Sulawesi Selatan': {'lat': -3.6687, 'lon': 119.9740},
+                'SULAWESI SELATAN': {'lat': -3.6687, 'lon': 119.9740},
+                'Sulawesi Tenggara': {'lat': -4.1448, 'lon': 122.1747},
+                'SULAWESI TENGGARA': {'lat': -4.1448, 'lon': 122.1747},
+                'Sulawesi Barat': {'lat': -2.8441, 'lon': 119.2320},
+                'SULAWESI BARAT': {'lat': -2.8441, 'lon': 119.2320},
+                
+                # Gorontalo variations
+                'Gorontalo': {'lat': 0.6999, 'lon': 122.4467},
+                'GORONTALO': {'lat': 0.6999, 'lon': 122.4467},
+                
+                # Maluku variations
+                'Maluku': {'lat': -3.2385, 'lon': 130.1453},
+                'MALUKU': {'lat': -3.2385, 'lon': 130.1453},
+                'Maluku Utara': {'lat': 1.5709, 'lon': 127.8087},
+                'MALUKU UTARA': {'lat': 1.5709, 'lon': 127.8087},
+                
+                # Papua variations
+                'Papua': {'lat': -4.2699, 'lon': 138.0804},
+                'PAPUA': {'lat': -4.2699, 'lon': 138.0804},
+                'Papua Barat': {'lat': -1.3361, 'lon': 133.1747},
+                'PAPUA BARAT': {'lat': -1.3361, 'lon': 133.1747},
+                
+                # Nusa Tenggara variations
+                'Nusa Tenggara Barat': {'lat': -8.6529, 'lon': 117.3616},
+                'NUSA TENGGARA BARAT': {'lat': -8.6529, 'lon': 117.3616},
+                'NUSA TENGGARA BARAT (NTB)': {'lat': -8.6529, 'lon': 117.3616},
+                'NTB': {'lat': -8.6529, 'lon': 117.3616},
+                'Nusa Tenggara Timur': {'lat': -8.6574, 'lon': 121.0794},
+                'NUSA TENGGARA TIMUR': {'lat': -8.6574, 'lon': 121.0794},
+                'NUSA TENGGARA TIMUR (NTT)': {'lat': -8.6574, 'lon': 121.0794},
+                'NTT': {'lat': -8.6574, 'lon': 121.0794}
+            }
+            
+            # Add coordinates to province_sales
+            province_sales['lat'] = province_sales['Provinsi'].map(lambda x: province_coords.get(x, {}).get('lat'))
+            province_sales['lon'] = province_sales['Provinsi'].map(lambda x: province_coords.get(x, {}).get('lon'))
+            
+            # Filter out provinces without coordinates
+            province_sales_mapped = province_sales.dropna(subset=['lat', 'lon'])
+            unmapped_provinces = province_sales[province_sales['lat'].isna()]['Provinsi'].tolist()
+            
+            if len(province_sales_mapped) > 0:
+                # Create scatter geo map
+                fig_map = px.scatter_geo(
+                    province_sales_mapped,
+                    lat='lat',
+                    lon='lon',
+                    size='Total Penjualan',
+                    hover_name='Provinsi',
+                    hover_data={'Total Penjualan': ':,.0f', 'lat': False, 'lon': False},
+                    color='Total Penjualan',
+                    color_continuous_scale=KERATONIAN_GRADIENT,
+                    size_max=40,
+                    labels={'Total Penjualan': 'Revenue (Rp)'}
+                )
+                
+                # Focus on Indonesia region
+                fig_map.update_geos(
+                    visible=True,
+                    resolution=50,
+                    showcountries=True,
+                    countrycolor="lightgray",
+                    showcoastlines=True,
+                    coastlinecolor="gray",
+                    showland=True,
+                    landcolor="rgb(243, 243, 243)",
+                    center=dict(lat=-2.5, lon=118),
+                    projection_type="natural earth",
+                    lataxis_range=[-11, 6],
+                    lonaxis_range=[95, 141]
+                )
+                
+                fig_map.update_layout(
+                    height=500,
+                    margin=dict(l=0, r=0, t=30, b=0),
+                    coloraxis_colorbar=dict(
+                        title="Revenue",
+                        tickformat='.2s',
+                        len=0.7
+                    )
+                )
+                
+                st.plotly_chart(fig_map, use_container_width=True)
+                
+                # Show mapping status
+                if len(unmapped_provinces) > 0:
+                    with st.expander(f"ℹ️ Info Pemetaan ({len(province_sales_mapped)} dari {len(province_sales)} provinsi terpetakan)"):
+                        st.caption(f"**Provinsi yang belum terpetakan:** {', '.join(unmapped_provinces)}")
+                        st.caption("Provinsi ini tetap ditampilkan di bar chart di bawah.")
+            else:
+                st.warning(f"📍 Tidak ada provinsi yang dapat dipetakan dari {len(province_sales)} provinsi di data Anda.")
+                st.info(f"**Nama provinsi di data Anda:** {', '.join(province_sales['Provinsi'].tolist()[:10])}" + 
+                       (f" ... dan {len(province_sales) - 10} lainnya" if len(province_sales) > 10 else ""))
+                st.caption("Silakan hubungi developer untuk menambahkan mapping provinsi yang belum terdaftar.")
+            
+            st.divider()
             
             col_geo1, col_geo2 = st.columns(2)
             
@@ -1143,6 +1423,74 @@ else:
                     coloraxis_showscale=False
                 )
                 st.plotly_chart(fig_dist, use_container_width=True)
+            
+            st.divider()
+            
+            # --- AI GEOGRAPHIC INSIGHTS ---
+            st.write("### 🤖 Geographic Insights (AI Generated)")
+            
+            # Calculate insights
+            total_provinces = geo_df['Provinsi'].nunique()
+            total_districts = geo_df['Daerah'].nunique()
+            top_province = by_province.iloc[0]['Provinsi'] if len(by_province) > 0 else "N/A"
+            top_province_revenue = by_province.iloc[0]['Total Penjualan'] if len(by_province) > 0 else 0
+            top_province_pct = (top_province_revenue / geo_df['Total Penjualan'].sum() * 100) if geo_df['Total Penjualan'].sum() > 0 else 0
+            
+            top_district = by_district.iloc[0]['Daerah'] if len(by_district) > 0 else "N/A"
+            top_district_revenue = by_district.iloc[0]['Total Penjualan'] if len(by_district) > 0 else 0
+            
+            # Top 3 provinces for concentration analysis
+            top_3_provinces = by_province.head(3)['Total Penjualan'].sum() if len(by_province) >= 3 else 0
+            top_3_pct = (top_3_provinces / geo_df['Total Penjualan'].sum() * 100) if geo_df['Total Penjualan'].sum() > 0 else 0
+            
+            # Java vs Non-Java analysis
+            java_provinces = ['DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Banten', 'DI Yogyakarta', 'Daerah Istimewa Yogyakarta']
+            java_revenue = geo_df[geo_df['Provinsi'].isin(java_provinces)]['Total Penjualan'].sum()
+            java_pct = (java_revenue / geo_df['Total Penjualan'].sum() * 100) if geo_df['Total Penjualan'].sum() > 0 else 0
+            
+            ins_geo_col1, ins_geo_col2 = st.columns(2)
+            
+            with ins_geo_col1:
+                st.markdown(f"""
+                <div class="insight-card" style="border-left-color: #622A0F;">
+                    <div class="insight-title"><span class="insight-icon">🏆</span> Dominasi Regional</div>
+                    <div class="insight-text">
+                        Provinsi <b>{top_province}</b> mendominasi dengan kontribusi <b>{top_province_pct:.1f}%</b> dari total revenue. 
+                        Top 3 provinsi menguasai <b>{top_3_pct:.1f}%</b> pasar, menunjukkan konsentrasi geografis yang tinggi.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown(f"""
+                <div class="insight-card" style="border-left-color: #7C4700;">
+                    <div class="insight-title"><span class="insight-icon">🎯</span> Fokus Kabupaten/Kota</div>
+                    <div class="insight-text">
+                        <b>{top_district}</b> adalah kabupaten/kota terkuat dengan revenue <b>{format_rupiah(top_district_revenue)}</b>. 
+                        Pertimbangkan membuka distributor lokal atau gudang regional di area ini.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with ins_geo_col2:
+                st.markdown(f"""
+                <div class="insight-card" style="border-left-color: #997950;">
+                    <div class="insight-title"><span class="insight-icon">🗺️</span> Jawa vs Luar Jawa</div>
+                    <div class="insight-text">
+                        Pulau Jawa berkontribusi <b>{java_pct:.1f}%</b> dari total penjualan. 
+                        {"Dominasi Jawa sangat kuat, pertimbangkan ekspansi agresif ke luar Jawa untuk diversifikasi pasar." if java_pct > 70 else "Distribusi geografis cukup seimbang, pertahankan strategi multi-regional."}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown(f"""
+                <div class="insight-card" style="border-left-color: #5C2C06;">
+                    <div class="insight-title"><span class="insight-icon">📊</span> Jangkauan Geografis</div>
+                    <div class="insight-text">
+                        Produk Anda telah menjangkau <b>{total_provinces} provinsi</b> dan <b>{total_districts} kabupaten/kota</b>. 
+                        Jangkauan yang luas ini menunjukkan penetrasi pasar nasional yang solid.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
         
         # ============================================
         # TAB 6: PREDICTION
@@ -1265,7 +1613,7 @@ else:
                     markers=True,
                     title='Tren Penjualan Historis & Prediksi Terusan (Forecast 3 Bulan Depan)',
                     labels={'Total Penjualan': 'Sales Revenue', 'Bulan': 'Bulan'},
-                    color_discrete_map={'Historical': '#845EC2', 'Forecast (Est)': '#00BF7A'}
+                    color_discrete_map={'Historical': '#622A0F', 'Forecast (Est)': '#997950'}
                 )
                 
                 # Add trendline styling
@@ -1395,15 +1743,15 @@ else:
             
             # Styling the dataframe (Updated with Brand Colors)
             def color_market(val):
-                if "High" in val: color = '#845EC2' # Purple (Primary)
-                elif "Medium" in val: color = '#2C73D2' # Blue
-                else: color = '#00BF7A' # Teal
+                if "High" in val: color = '#622A0F' # Cinnamon (Dark)
+                elif "Medium" in val: color = '#7C4700' # Brown
+                else: color = '#997950' # Tortilla (Light)
                 return f'background-color: {color}; color: white; font-weight: bold'
 
             def color_rec(val):
-                if "URGENT" in val: color = '#845EC2'
-                elif "Siaga" in val: color = '#2C73D2'
-                else: color = '#00BF7A'
+                if "URGENT" in val: color = '#622A0F'
+                elif "Siaga" in val: color = '#7C4700'
+                else: color = '#997950'
                 return f'color: {color}; font-weight: bold'
 
             st.dataframe(
