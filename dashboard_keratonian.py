@@ -369,7 +369,7 @@ if not st.session_state.dashboard_ready:
     col1, col2 = st.columns([1.2, 1])
     
     with col1:
-        st.image("assets/image (1).png", use_container_width=True)
+        st.image("assets/2 (1).png", use_container_width=True)
     
     with col2:
         st.markdown("<div style='padding: 30px 20px;'>", unsafe_allow_html=True)
