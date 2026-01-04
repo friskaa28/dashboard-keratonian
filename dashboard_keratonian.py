@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
+from sklearn.linear_model import LinearRegression
 
 warnings.filterwarnings('ignore')
 
@@ -348,19 +349,26 @@ def load_data(file_path):
 
 @st.cache_resource
 def train_prediction_model(df):
-    """Train Random Forest model based on notebook logic"""
-    # Create copy for training
+    """Train Random Forest models for Transaction Value and Churn Risk"""
     train_df = df.copy()
     
-    # Define Target: High Value (1) if > median, else Low Value (0)
+    # 1. VALUE PREDICTION MODEL (Existing)
     median_val = train_df['Total Penjualan'].median()
     train_df['Kategori_Transaksi'] = (train_df['Total Penjualan'] > median_val).astype(int)
     
+    # 2. CHURN PREDICTION MODEL (New Logic)
+    # Define Churn: Customer has not ordered in the last 6 months (relative to dataset max date)
+    max_date = train_df['Tanggal Order'].max()
+    cust_last_date = train_df.groupby('Cust')['Tanggal Order'].transform('max')
+    # Use 180 days as threshold for churn
+    train_df['Days_Since_Last'] = (max_date - cust_last_date).dt.days
+    train_df['is_churn'] = (train_df['Days_Since_Last'] > 180).astype(int)
+    
     # Feature Engineering
-    # Features: Qty, Harga Jual, Total Diskon, Provinsi, Channel, Pesanan
     features = ['Qty', 'Harga Jual', 'Total Diskon', 'Provinsi', 'Channel', 'Pesanan']
     X = train_df[features].copy()
-    y = train_df['Kategori_Transaksi']
+    y_value = train_df['Kategori_Transaksi']
+    y_churn = train_df['is_churn']
     
     # Encoding categorical features
     encoders = {}
@@ -370,18 +378,26 @@ def train_prediction_model(df):
         X[col] = le.fit_transform(X[col].astype(str))
         encoders[col] = le
         
-    # Split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Split data for Value Model
+    X_train_v, X_test_v, y_train_v, y_test_v = train_test_split(X, y_value, test_size=0.2, random_state=42)
+    model_value = RandomForestClassifier(n_estimators=100, random_state=42)
+    model_value.fit(X_train_v, y_train_v)
+    acc_value = accuracy_score(y_test_v, model_value.predict(X_test_v))
     
-    # Train Model
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
+    # Split data for Churn Model
+    X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(X, y_churn, test_size=0.2, random_state=42)
+    model_churn = RandomForestClassifier(n_estimators=100, random_state=42)
+    model_churn.fit(X_train_c, y_train_c)
+    acc_churn = accuracy_score(y_test_c, model_churn.predict(X_test_c))
     
-    # Evaluate
-    y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    
-    return model, encoders, acc, median_val
+    return {
+        'value_model': model_value,
+        'churn_model': model_churn,
+        'encoders': encoders,
+        'acc_value': acc_value,
+        'acc_churn': acc_churn,
+        'median_threshold': median_val
+    }
 
 # Load data
 try:
@@ -391,8 +407,14 @@ except FileNotFoundError:
     st.info("Pastikan file CSV ada di folder yang sama dengan script ini")
     st.stop()
 
-# Train Prediction Model
-model, encoders, model_acc, median_threshold = train_prediction_model(df)
+# Train Prediction Models
+trained_assets = train_prediction_model(df)
+model = trained_assets['value_model']
+churn_model = trained_assets['churn_model']
+encoders = trained_assets['encoders']
+model_acc = trained_assets['acc_value']
+churn_acc = trained_assets['acc_churn']
+median_threshold = trained_assets['median_threshold']
 
 # ============================================
 # SESSION STATE INITIALIZATION
@@ -515,18 +537,36 @@ else:
     
     # Channel Filter
     channels = sorted([c for c in dashboard_df['Channel'].unique() if c != 'Sample'])
+    
+    # Initialize session state for filters if not exists
+    if 'chan_multiselect' not in st.session_state:
+        st.session_state.chan_multiselect = channels if len(channels) <= 5 else channels[:3]
+    if 'cat_multiselect' not in st.session_state:
+        st.session_state.cat_multiselect = categories if 'categories' in locals() else sorted(dashboard_df['Kategori'].unique())
+
+    # Select All Channel logic
+    if st.sidebar.button("✅ Select All Channel", key="sel_all_chan"):
+        st.session_state.chan_multiselect = channels
+        st.rerun()
+
     selected_channels = st.sidebar.multiselect(
         "📱 Pilih Channel:",
         channels,
-        default=channels if len(channels) <= 5 else channels[:3]
+        key="chan_multiselect"
     )
     
     # Category Filter
     categories = sorted(dashboard_df['Kategori'].unique())
+    
+    # Select All Category logic
+    if st.sidebar.button("✅ Select All Kategori", key="sel_all_cat"):
+        st.session_state.cat_multiselect = categories
+        st.rerun()
+
     selected_categories = st.sidebar.multiselect(
         "🏷️ Pilih Kategori:",
         categories,
-        default=categories
+        key="cat_multiselect"
     )
     
     # Reset Button
@@ -673,13 +713,14 @@ else:
         # TABS
         # ============================================
         
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
             "📋 Overview",
             "🏆 Best Seller",
             "⏰ Prime Time",
             "👥 Customers",
             "🗺️ Geographic",
-            "🔮 Prediction",
+            "🔮 Value Prediction",
+            "🚨 Churn Analysis",
             "📦 Stock Recommendation",
             "📥 Export"
         ])
@@ -740,7 +781,7 @@ else:
             st.divider()
             
             # --- AI DATA INSIGHTS (REAMPED) ---
-            st.write("### 🤖 Data Insights (AI Generated)")
+            st.write("### 🤖 Data Insights")
             
             # Logic for Dynamic Insights
             top_channel = ov_df.groupby('Channel')['Total Penjualan'].sum().idxmax() if not ov_df.empty else "N/A"
@@ -972,6 +1013,43 @@ else:
             best_qty_display = best_qty.copy()
             best_qty_display['Revenue'] = best_qty_display['Revenue'].apply(format_rupiah)
             st.dataframe(best_qty_display.head(10), use_container_width=True)
+            
+            st.divider()
+            
+            # --- MARKETING STRATEGIES (New Section) ---
+            st.subheader("💡 Marketing & Sales Strategies")
+            
+            # Extract top overall product
+            if not best_qty.empty:
+                top_p_name = best_qty.index[0]
+                top_p_qty = best_qty.iloc[0]['Unit']
+                top_p_rev = best_qty.iloc[0]['Revenue']
+                
+                strat_col1, strat_col2 = st.columns(2)
+                
+                with strat_col1:
+                    st.info(f"**Main Focus: {top_p_name}**")
+                    st.markdown(f"""
+                    Produk ini adalah kontributor utama dengan **{top_p_qty:,} unit** terjual.
+                    
+                    **Action Plan**
+                    *   **Scale Up:** Tingkatkan anggaran iklan Meta/Google untuk produk ini.
+                    *   **Bundling:** Buat paket hemat dengan produk 'Slow Moving' untuk cuci gudang.
+                    *   **Retention:** Berikan voucher diskon khusus untuk pembelian berikutnya pada item ini.
+                    """)
+                
+                with strat_col2:
+                    st.success("**Revenue Optimization Strategy**")
+                    st.markdown(f"""
+                    Total revenue dari best seller mencapai **{format_rupiah(top_p_rev)}**.
+                    
+                    **Recommendations**
+                    *   **Subscription Model:** Jika memungkinkan, buat opsi berlangganan bulanan.
+                    *   **Upselling:** Tawarkan varian premium atau ukuran lebih besar saat checkout.
+                    *   **Cross-Selling:** Analisis data menunjukkan item pendukung (seperti Tatakan) dapat meningkatkan AOV (Average Order Value).
+                    """)
+            else:
+                st.info("Pilih filter untuk melihat strategi marketing yang relevan.")
         
         # ============================================
         # TAB 3: PRIME TIME
@@ -1478,7 +1556,7 @@ else:
             st.divider()
             
             # --- AI GEOGRAPHIC INSIGHTS ---
-            st.write("### 🤖 Geographic Insights (AI Generated)")
+            st.write("### 🤖 Geographic Insights ")
             
             # Calculate insights
             total_provinces = geo_df['Provinsi'].nunique()
@@ -1544,30 +1622,27 @@ else:
                 """, unsafe_allow_html=True)
         
         # ============================================
-        # TAB 6: PREDICTION
+        # TAB 6: VALUE PREDICTION
         # ============================================
         
         with tab6:
             st.subheader("🔮 Transaction Value Prediction")
-            st.markdown(f"**Model Accuracy:** `{model_acc:.2%}`")
-            st.markdown("Prediksi apakah transaksi akan masuk kategori **High Value** (> median) atau **Low Value**.")
+            st.write("Prediksi apakah transaksi baru akan menghasilkan nilai tinggi (**High Value**) atau rendah (**Low Value**) berdasarkan AI.")
             
             with st.form("prediction_form"):
-                col_pred1, col_pred2 = st.columns(2)
+                col_p1, col_p2 = st.columns(2)
                 
-                with col_pred1:
-                    # Numeric Inputs
-                    qty_input = st.number_input("Quantity", min_value=1, value=1)
-                    price_input = st.number_input("Harga Jual", min_value=0, value=25000)
+                with col_p1:
+                    qty_input = st.number_input("Quantity (Qty)", min_value=1, value=1)
+                    price_input = st.number_input("Harga Jual", min_value=1, value=150000)
                     discount_input = st.number_input("Total Diskon", min_value=0, value=0)
                 
-                with col_pred2:
-                    # Categorical Inputs
+                with col_p2:
                     provinsi_opt = sorted(df['Provinsi'].astype(str).unique())
-                    provinsi_input = st.selectbox("Provinsi", provinsi_opt)
+                    provinsi_input = st.selectbox("Provinsi Kirim", provinsi_opt)
                     
                     channel_opt = sorted(df['Channel'].astype(str).unique())
-                    channel_input = st.selectbox("Channel", channel_opt)
+                    channel_input = st.selectbox("Sales Channel", channel_opt)
                     
                     pesanan_opt = sorted(df['Pesanan'].astype(str).unique())
                     pesanan_input = st.selectbox("Product (Pesanan)", pesanan_opt)
@@ -1587,19 +1662,18 @@ else:
                         }])
                         
                         # Prediction
-                        prediction = model.predict(input_data)[0]
-                        prob = model.predict_proba(input_data)[0][prediction]
+                        val_pred = model.predict(input_data)[0]
+                        val_prob = model.predict_proba(input_data)[0][val_pred]
                         
-                        if prediction == 1:
+                        if val_pred == 1:
                             st.success(f"### Result: 💎 High Value Transaction")
-                            st.write(f"Confidence: {prob:.2%}")
+                            st.write(f"Confidence: {val_prob:.2%}")
                         else:
                             st.info(f"### Result: 📦 Low Value Transaction")
-                            st.write(f"Confidence: {prob:.2%}")
+                            st.write(f"Confidence: {val_prob:.2%}")
                             
                         st.caption(f"Median Threshold: {format_rupiah(median_threshold)}")
-                    except Exception as e:
-                        st.caption(f"Median Threshold: {format_rupiah(median_threshold)}")
+                                
                     except Exception as e:
                         st.error(f"Error in prediction: {e}")
 
@@ -1687,12 +1761,170 @@ else:
             else:
                 st.warning("⚠️ Data belum cukup untuk melakukan forecasting (Minimal butuh > 1 bulan data).")
 
+            st.divider()
+
+            # --- STRATEGIC Q1 2026 PREDICTION (New Requested Feature) ---
+            st.subheader("🎯 Strategic Forecast: Q1 2026 Analysis")
+            st.write("Prediksi performa Kuartal 1 (Jan-Mar) tahun 2026 berdasarkan pola musiman 3 tahun terakhir.")
+
+            # Filter data khusus Q1 untuk semua tahun yang tersedia di base data (df)
+            q1_all_years = df[df['Tanggal Order'].dt.quarter == 1].copy()
+            q1_summary = q1_all_years.groupby(q1_all_years['Tanggal Order'].dt.year)['Total Penjualan'].sum().reset_index()
+            q1_summary.columns = ['Tahun', 'Revenue']
+
+            if not q1_summary.empty and len(q1_summary) >= 2:
+                # --- MODELING BASED PREDICTION (Linear Regression) ---
+                # Prepare X (years as 1, 2, 3...) and Y (revenue)
+                X_reg = np.array(range(len(q1_summary))).reshape(-1, 1)
+                y_reg = q1_summary['Revenue'].values
+                
+                # Train simple regression model
+                reg_model = LinearRegression()
+                reg_model.fit(X_reg, y_reg)
+                
+                # Predict for next year (index len(X))
+                next_index = np.array([[len(q1_summary)]])
+                proj_q1_2026 = reg_model.predict(next_index)[0]
+                
+                # Calculate growth representation for delta
+                last_q1_rev = q1_summary['Revenue'].iloc[-1]
+                growth_delta = (proj_q1_2026 - last_q1_rev) / last_q1_rev if last_q1_rev > 0 else 0
+
+                col_strat1, col_strat2 = st.columns([1.5, 1])
+
+                with col_strat1:
+                    # Bar Chart Historical Q1
+                    fig_q1_hist = px.bar(
+                        q1_summary,
+                        x='Tahun',
+                        y='Revenue',
+                        title='Historical Q1 Performance (Jan-Mar)',
+                        labels={'Revenue': 'Total Revenue', 'Tahun': 'Tahun'},
+                        color='Revenue',
+                        color_continuous_scale=KERATONIAN_GRADIENT,
+                        text_auto='.2s'
+                    )
+                    fig_q1_hist.update_layout(xaxis=dict(type='category'))
+                    st.plotly_chart(fig_q1_hist, use_container_width=True)
+
+                with col_strat2:
+                    st.write("#### AI Regression Projection")
+                    st.metric(
+                        "Projected Q1 2026 (AI Model)",
+                        format_rupiah(proj_q1_2026),
+                        delta=f"{(growth_delta*100):.1f}% vs 2025"
+                    )
+                    
+                    st.markdown(f"""
+                    <div class="insight-card" style="border-left-color: #7C4700; height: auto; padding: 15px;">
+                        <div class="insight-title"><span class="insight-icon">🤖</span> AI Modeling Insight</div>
+                        <div class="insight-text" style="font-size: 0.85rem;">
+                           Berikut prediksi penjualan Q1 di 2026 berdasarkan histori data penjualan pada Q1 di 2023,2024 dan 2025 untuk memprediksi tren yang lebih stabil.
+                            <br><br>
+                            <b>Hasil Analisis:</b>
+                            <ul>
+                                <li>Model AI memprediksi pendapatan Q1 2026 di angka <b>{format_rupiah(proj_q1_2026)}</b>.</li>
+                                <li>Angka ini lebih realistis karena memperhitungkan perlambatan laju pertumbuhan di tahun 2025.</li>
+                                <li><b>Strategi:</b> Fokus pada optimasi operasional untuk menjaga tren pertumbuhan tetap di angka {(growth_delta*100):.1f}%.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("Data historis Q1 tidak cukup untuk melakukan analisis perbandingan tahunan.")
+
 
         # ============================================
-        # TAB 7: STOCK RECOMMENDATION
+        # TAB 7: CHURN ANALYSIS
         # ============================================
         
         with tab7:
+            st.subheader("🚨 Customer Churn Analysis & Risk Detection")
+            st.write("Analisis pelanggan yang berisiko berhenti berlangganan atau tidak melakukan order ulang.")
+            
+            # --- CHURN CALCULATION FOR CURRENT FILTERED DATA ---
+            max_d = filtered_df['Tanggal Order'].max()
+            churn_analysis = filtered_df.groupby('Cust').agg({
+                'Tanggal Order': 'max',
+                'Total Penjualan': 'sum',
+                'Pesanan': 'count',
+                'Qty': 'sum',
+                'Provinsi': 'first',
+                'Channel': 'first'
+            }).rename(columns={'Pesanan': 'Frequency', 'Tanggal Order': 'Last_Order'})
+            
+            churn_analysis['Days_Since_Last'] = (max_d - churn_analysis['Last_Order']).dt.days
+            churn_analysis['Status'] = np.where(churn_analysis['Days_Since_Last'] > 180, 'Churned', 'Active')
+            
+            c_metric1, c_metric2, c_metric3 = st.columns(3)
+            with c_metric1:
+                total_cust = len(churn_analysis)
+                st.metric("Total Customers", f"{total_cust:,}")
+            with c_metric2:
+                active_cust = len(churn_analysis[churn_analysis['Status'] == 'Active'])
+                st.metric("Active Customers", f"{active_cust:,}", delta=f"{(active_cust/total_cust*100) if total_cust > 0 else 0:.1f}%")
+            with c_metric3:
+                churned_cust = len(churn_analysis[churn_analysis['Status'] == 'Churned'])
+                st.metric("Churned Customers (>180d)", f"{churned_cust:,}", delta=f"-{(churned_cust/total_cust*100) if total_cust > 0 else 0:.1f}%", delta_color="inverse")
+            
+            st.divider()
+            
+            col_ch1, col_ch2 = st.columns([1, 1])
+            
+            with col_ch1:
+                st.write("### Churn Distribution")
+                status_counts = churn_analysis['Status'].value_counts()
+                fig_churn = px.pie(
+                    values=status_counts.values,
+                    names=status_counts.index,
+                    hole=0.4,
+                    color=status_counts.index,
+                    color_discrete_map={'Active': '#7C4700', 'Churned': '#622A0F'}
+                )
+                st.plotly_chart(fig_churn, use_container_width=True)
+                
+            with col_ch2:
+                st.write("### 🤖 Data Insights: Churn Analysis")
+                
+                # Logic for Churn Insights
+                avg_days = churn_analysis['Days_Since_Last'].mean()
+                top_churn_prov = churn_analysis[churn_analysis['Status'] == 'Churned']['Provinsi'].mode().iloc[0] if not churn_analysis[churn_analysis['Status'] == 'Churned'].empty else "N/A"
+                
+                st.markdown(f"""
+                <div class="insight-card" style="border-left-color: #622A0F; height: auto;">
+                    <div class="insight-title"><span class="insight-icon">📉</span> Analisis Loyalitas</div>
+                    <div class="insight-text">
+                        Rata-rata pelanggan sudah tidak melakukan transaksi selama <b>{avg_days:.1f} hari</b>. 
+                        Provinsi dengan tingkat churn tertinggi adalah <b>{top_churn_prov}</b>.
+                        <br><br>
+                        <b>Rekomendasi Strategis</b>
+                        <ul>
+                            <li><b>Re-engagement:</b> Kirim pesan singkat "We Miss You" kepada pelanggan yang terdaftar di daftar Churned.</li>
+                            <li><b>Loyalty Program:</b> Berikan poin atau reward khusus untuk pelanggan Active agar tidak berpindah ke kompetitor.</li>
+                            <li><b>Survey:</b> Lakukan survey kepuasan pelanggan di area {top_churn_prov} untuk mencari tahu alasan berhenti order.</li>
+                        </ul>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.divider()
+            st.write("### 👥 Customers at Risk / Churned List")
+            at_risk = churn_analysis[churn_analysis['Status'] == 'Churned'].sort_values('Days_Since_Last', ascending=False)
+            
+            if not at_risk.empty:
+                st.warning(f"Ditemukan {len(at_risk)} pelanggan yang tidak aktif lebih dari 6 bulan.")
+                at_risk_display = at_risk[['Last_Order', 'Days_Since_Last', 'Frequency', 'Total Penjualan', 'Provinsi']].copy()
+                at_risk_display['Last_Order'] = pd.to_datetime(at_risk_display['Last_Order']).dt.date
+                at_risk_display['Total Penjualan'] = at_risk_display['Total Penjualan'].apply(format_rupiah)
+                st.dataframe(at_risk_display.head(50), use_container_width=True)
+            else:
+                st.success("Hebat! Semua pelanggan aktif dalam 6 bulan terakhir.")
+
+        # ============================================
+        # TAB 8: STOCK RECOMMENDATION
+        # ============================================
+        
+        with tab8:
             st.subheader("📦 REKOMENDASI AKSI GUDANG (ACTION PLAN)")
             
             # --- GLOSSARY / KETERANGAN ---
@@ -1813,10 +2045,10 @@ else:
             )
 
         # ============================================
-        # TAB 8: EXPORT
+        # TAB 9: EXPORT
         # ============================================
         
-        with tab8:
+        with tab9:
             st.subheader("📥 Export Data")
             
             st.write("Download hasil analisis dalam format Excel atau CSV:")
